@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup && tsc -p .",
     "typecheck": "tsc -p . --noEmit",
+    "size": "node scripts/check-size.mjs 5",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

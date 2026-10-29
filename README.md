@@ -159,7 +159,7 @@ npm run dev          # http://localhost:4321/lite-3d/
 npm run build        # docs/dist
 ```
 
-Pushing to `main` deploys the docs to GitHub Pages; publishing a GitHub Release publishes the package to npm (see `.github/workflows`).
+Pull requests run CI (build, types, a 5 KB first-load budget, docs build). Merging to `main` re-runs the checks and deploys the docs to GitHub Pages; publishing a GitHub Release publishes the package to npm. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Credits
 

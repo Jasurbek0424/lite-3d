@@ -1,0 +1,55 @@
+# Har bir PR'da tekshiruvlar: kutubxona build'i, tiplar, birinchi yuklanish hajmi va sayt build'i.
+# main'ga merge bo'lganda docs.yml shu faylni chaqiradi: tekshiruvlar o'tsagina sayt deploy qilinadi.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  library:
+    name: Library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: First-load size
+        run: npm run size
+
+  docs:
+    name: Docs site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            docs/package-lock.json
+      # Sayt kutubxonani ../src dan oladi, uning three va tiplari root'da o'rnatiladi
+      - run: npm ci
+      - run: npm ci
+        working-directory: docs
+      - run: npm run build
+        working-directory: docs
+      # docs.yml chaqirganda tayyor saytni deploy uchun saqlab qo'yadi (PR'larda kerak emas)
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/dist

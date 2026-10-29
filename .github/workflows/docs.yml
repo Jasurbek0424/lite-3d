@@ -1,6 +1,7 @@
-# Hujjat saytini GitHub Pages'ga chiqaradi: https://jasurbek0424.github.io/lite-3d/
+# main'ga merge (push) bo'lganda: avval CI tekshiruvlari, o'tsa sayt GitHub Pages'ga chiqadi.
+# https://jasurbek0424.github.io/lite-3d/
 # Bir marta sozlash kerak: Settings → Pages → Source: "GitHub Actions".
-name: Docs
+name: Deploy docs
 
 on:
   push:
@@ -14,32 +15,14 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            docs/package-lock.json
-      # Sayt kutubxonani ../src dan oladi, uning tiplari va three root'da o'rnatiladi
-      - run: npm ci
-      - run: npm ci
-        working-directory: docs
-      - run: npm run build
-        working-directory: docs
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/dist
+  checks:
+    uses: ./.github/workflows/ci.yml
 
   deploy:
-    needs: build
+    needs: checks
     runs-on: ubuntu-latest
     environment:
       name: github-pages
