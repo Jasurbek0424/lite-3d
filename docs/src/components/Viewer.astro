@@ -5,11 +5,12 @@
  * Animatsiyalar bosh sahifadagi qoida bilan chiqadi: 4 tagacha tugma, qolgani "Yana harakatlar" ro'yxatida.
  */
 import { langFromPath, t } from '../i18n';
+import { posterFor } from '../data/models';
 
 interface Props {
   src: string;
   controls?: 'variants' | 'animations';
-  /** Sayt ichidagi rasm: /posters/car.webp. Base yo'li o'zi qo'shiladi. */
+  /** Sayt ichidagi rasm: /posters/car.webp. Base yo'li o'zi qo'shiladi. Berilmasa modelning o'z posteri. */
   poster?: string;
   /**
    * Hotspot'lar ma'lumot sifatida: Astro `slot="..."` atributini o'z slot'i deb
@@ -18,7 +19,7 @@ interface Props {
   hotspots?: { label: string; position: string; normal?: string }[];
   [attr: string]: unknown;
 }
-const { src, controls, poster, hotspots = [], ...attrs } = Astro.props;
+const { src, controls, poster = posterFor(src), hotspots = [], ...attrs } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const tr = t(langFromPath(Astro.url.pathname));
 const url = `${base}/models/${src}`;

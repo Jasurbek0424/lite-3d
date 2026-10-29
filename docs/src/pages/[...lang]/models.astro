@@ -21,7 +21,7 @@ const text = {
     open: 'Open in demo',
     openLabel: (name: string) => `Open ${name} in the demo`,
     aside:
-      'Size is the file size on this site. The models are packed into a single file (base64) for testing, so a regular .glb is roughly a third smaller.',
+      'Size is the .glb file the browser downloads. Until it arrives, the viewer shows a 20–40 KB poster image.',
   },
   uz: {
     title: 'Modellar',
@@ -32,7 +32,7 @@ const text = {
     open: 'Demoda ochish',
     openLabel: (name: string) => `${name}ni demoda ochish`,
     aside:
-      "Hajm — saytdagi fayl hajmi. Modellar sinov uchun bitta faylga joylangan (base64), shuning uchun oddiy .glb varianti taxminan uchdan bir qism kichikroq bo'ladi.",
+      "Hajm — brauzer yuklab oladigan .glb fayl hajmi. U kelguncha viewer 20–40 KB'lik poster rasmini ko'rsatib turadi.",
   },
   ru: {
     title: 'Модели',
@@ -43,7 +43,7 @@ const text = {
     open: 'Открыть в демо',
     openLabel: (name: string) => `Открыть «${name}» в демо`,
     aside:
-      'Размер — это размер файла на сайте. Для тестов модели упакованы в один файл (base64), поэтому обычный .glb примерно на треть меньше.',
+      'Размер — это файл .glb, который скачивает браузер. Пока он грузится, вместо модели виден постер на 20–40 KB.',
   },
 }[lang];
 ---
