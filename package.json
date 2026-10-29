@@ -1,6 +1,6 @@
 {
   "name": "lite3d",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A 4.5 KB web component for 3D product viewers. three.js loads only when the model is needed.",
   "main": "./dist/index.js",
   "scripts": {
