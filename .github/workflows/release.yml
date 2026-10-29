@@ -1,6 +1,8 @@
-# GitHub'da Release chiqarilganda paketni npm'ga joylaydi.
-# Bir marta sozlash kerak: npm'da Access Token yarating (Automation) va uni
-# Settings → Secrets and variables → Actions ga NPM_TOKEN nomi bilan qo'shing.
+# GitHub'da Release chiqarilganda paketni npm'ga navbatga qo'yadi (staged publish).
+# Versiya siz npmjs.com'da 2FA bilan "Approve" bosganingizdan keyingina ommaga chiqadi.
+#
+# Kalit (token) kerak emas: npm Trusted Publishing shu repo va shu fayl nomiga bog'langan
+# (npmjs.com → lite3d → Settings → Trusted Publisher → GitHub Actions, release.yml).
 name: Release
 
 on:
@@ -9,7 +11,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm provenance: paket qaysi commit'dan yig'ilgani npm sahifasida ko'rinadi
+  id-token: write # npm Trusted Publishing (OIDC) uchun
 
 jobs:
   publish:
@@ -21,10 +23,18 @@ jobs:
           node-version: 22
           cache: npm
           registry-url: https://registry.npmjs.org
+      # Teg va package.json versiyasi mos kelmasa, noto'g'ri versiya chiqib ketmasin
+      - name: Check tag matches package.json
+        run: |
+          expected="v$(node -p "require('./package.json').version")"
+          if [ "$expected" != "${{ github.event.release.tag_name }}" ]; then
+            echo "Release tag ${{ github.event.release.tag_name }} does not match package.json ($expected)"
+            exit 1
+          fi
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
       - run: npm run size
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # npm stage 11.15.0 dan boshlab bor; Node 22 bilan kelgan npm undan eski
+      - run: npm install -g npm@11
+      - run: npm stage publish
