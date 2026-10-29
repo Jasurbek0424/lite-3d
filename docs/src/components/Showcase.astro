@@ -18,7 +18,12 @@ const backgrounds = [
   { value: '#e9e2d6', label: tr['bg.sand'] },
   { value: '#1b2433', label: tr['bg.graphite'] },
 ];
-const data = models.map((m) => ({ ...m, url: `${base}/models/${m.file}`, alt: altFor(m.name) }));
+const data = models.map((m) => ({
+  ...m,
+  url: `${base}/models/${m.file}`,
+  poster: `${base}/posters/${m.id}.webp`,
+  alt: altFor(m.name),
+}));
 ---
 
 <section class="showcase not-content" data-models={JSON.stringify(data)}>
@@ -43,6 +48,7 @@ const data = models.map((m) => ({ ...m, url: `${base}/models/${m.file}`, alt: al
     <lite-3d
       id="l3-show"
       src={`${base}/models/${first.file}`}
+      poster={`${base}/posters/${first.id}.webp`}
       alt={altFor(first.name)}
       loading="eager"
       autorotate
@@ -150,7 +156,7 @@ const data = models.map((m) => ({ ...m, url: `${base}/models/${m.file}`, alt: al
   import { clearMoves, renderMoves } from '../scripts/moves';
   import { pageLang, t } from '../i18n';
 
-  type Model = { id: string; name: string; alt: string; category: string; url: string; sample: string; attrs?: Record<string, string> };
+  type Model = { id: string; name: string; alt: string; category: string; url: string; poster: string; sample: string; attrs?: Record<string, string> };
 
   const tr = t(pageLang());
 
@@ -231,6 +237,8 @@ const data = models.map((m) => ({ ...m, url: `${base}/models/${m.file}`, alt: al
     for (const a of ['autoplay', 'animation-name']) el.removeAttribute(a);
     for (const [k, v] of Object.entries(m.attrs ?? {})) el.setAttribute(k, v);
     el.setAttribute('alt', m.alt);
+    // poster src'dan oldin: yangi model yuklanguncha uning rasmi ko'rinsin
+    el.setAttribute('poster', m.poster);
     el.setAttribute('src', m.url);
     category.textContent = m.category;
     clearMoves(moves);

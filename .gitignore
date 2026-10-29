@@ -1,5 +1,7 @@
 node_modules
 dist
 *.glb
+# saytdagi namunaviy modellar repoga kiradi
+!docs/public/models/*.glb
 *.tgz
 .DS_Store

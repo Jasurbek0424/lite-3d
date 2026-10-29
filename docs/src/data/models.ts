@@ -33,7 +33,7 @@ export interface DemoModel {
 const sources: ModelSource[] = [
   {
     id: 'chair',
-    file: 'SheenChair.gltf.json',
+    file: 'SheenChair.glb',
     sample: { en: 'chair.glb', uz: 'kreslo.glb', ru: 'chair.glb' },
     name: { en: 'Velvet chair', uz: 'Baxmal kreslo', ru: 'Бархатное кресло' },
     short: { en: 'Chair', uz: 'Kreslo', ru: 'Кресло' },
@@ -51,7 +51,7 @@ const sources: ModelSource[] = [
   },
   {
     id: 'watch',
-    file: 'Watch.gltf.json',
+    file: 'Watch.glb',
     sample: { en: 'watch.glb', uz: 'soat.glb', ru: 'watch.glb' },
     name: { en: 'Chronograph watch', uz: 'Xronograf soat', ru: 'Часы-хронограф' },
     short: { en: 'Watch', uz: 'Soat', ru: 'Часы' },
@@ -70,7 +70,7 @@ const sources: ModelSource[] = [
   },
   {
     id: 'robot',
-    file: 'Robot.gltf.json',
+    file: 'Robot.glb',
     sample: { en: 'robot.glb', uz: 'robot.glb', ru: 'robot.glb' },
     name: { en: 'Robot', uz: 'Robot', ru: 'Робот' },
     short: { en: 'Robot', uz: 'Robot', ru: 'Робот' },
@@ -89,7 +89,7 @@ const sources: ModelSource[] = [
   },
   {
     id: 'car',
-    file: 'ToyCar.gltf.json',
+    file: 'ToyCar.glb',
     sample: { en: 'car.glb', uz: 'mashina.glb', ru: 'car.glb' },
     name: { en: 'Toy car', uz: "O'yinchoq mashina", ru: 'Игрушечная машинка' },
     short: { en: 'Car', uz: 'Mashina', ru: 'Машинка' },
@@ -119,6 +119,12 @@ export function getModels(lang: Lang): DemoModel[] {
     credit: m.credit[lang],
     attrs: m.attrs,
   }));
+}
+
+/** Model faylining posteri (public/posters/{id}.webp): 3D yuklanguncha shu rasm ko'rinadi. */
+export function posterFor(file: string): string | undefined {
+  const m = sources.find((s) => s.file === file);
+  return m && `/posters/${m.id}.webp`;
 }
 
 /** Fayl hajmi build paytida diskdan o'qiladi, qo'lda yozilmaydi. */
