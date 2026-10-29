@@ -18,6 +18,7 @@ import {
   DirectionalLight,
   Group,
   HemisphereLight,
+  LoaderUtils,
   LoopOnce,
   LoopRepeat,
   Mesh,
@@ -106,7 +107,8 @@ export interface RendererEvents {
 }
 
 export interface Renderer {
-  load(url: string, onProgress: (p: number) => void): Promise<ModelInfo>;
+  /** `early` — element oldindan boshlab qo'ygan so'rov; bo'lmasa shu yerda yuklanadi. */
+  load(url: string, onProgress: (p: number) => void, early?: Promise<Response> | null): Promise<ModelInfo>;
   info(): ModelInfo;
   update(opts: RendererOptions): void;
   setActive(active: boolean): void;
@@ -218,6 +220,32 @@ function createContactShadow(renderer: WebGLRenderer) {
       [planeMat, depth, hBlur, vBlur].forEach((m) => m.dispose());
     },
   };
+}
+
+/** Javobni o'qib, progressni (0..1) xabar qiladi. Hajm noma'lum bo'lsa progress bo'lmaydi. */
+async function download(pending: Promise<Response>, onProgress: (p: number) => void): Promise<ArrayBuffer> {
+  const res = await pending;
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${res.url}`);
+  // gzip bilan kelsa content-length siqilgan hajm bo'ladi, shuning uchun 1 dan oshirmaymiz
+  const total = Number(res.headers.get('content-length'));
+  if (!total || !res.body) return res.arrayBuffer();
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let got = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    got += value.length;
+    onProgress(Math.min(got / total, 1));
+  }
+  const out = new Uint8Array(got);
+  let at = 0;
+  for (const c of chunks) {
+    out.set(c, at);
+    at += c.length;
+  }
+  return out.buffer;
 }
 
 function materialsOf(m: Mesh): Material[] {
@@ -557,21 +585,19 @@ export function createRenderer(
   const fmt = (v: Vector3, digits: number) => v.toArray().map((n) => +n.toFixed(digits)).join(' ');
 
   return {
-    async load(url, onProgress) {
+    async load(url, onProgress, early) {
       const id = ++loadId;
       const loader = new GLTFLoader();
-      const [{ MeshoptDecoder }] = await Promise.all([
+      const dracoPath = opts.dracoDecoderPath;
+      // Fayl va dekoderlar bir vaqtda yuklanadi
+      const [{ MeshoptDecoder }, draco, data] = await Promise.all([
         import('three/examples/jsm/libs/meshopt_decoder.module.js'),
+        dracoPath ? import('three/examples/jsm/loaders/DRACOLoader.js') : null,
+        download(early ?? fetch(url), onProgress),
       ]);
       loader.setMeshoptDecoder(MeshoptDecoder);
-      if (opts.dracoDecoderPath) {
-        const { DRACOLoader } = await import('three/examples/jsm/loaders/DRACOLoader.js');
-        const draco = new DRACOLoader().setDecoderPath(opts.dracoDecoderPath);
-        loader.setDRACOLoader(draco);
-      }
-      const gltf = await loader.loadAsync(url, (e) => {
-        if (e.lengthComputable && e.total) onProgress(e.loaded / e.total);
-      });
+      if (draco) loader.setDRACOLoader(new draco.DRACOLoader().setDecoderPath(dracoPath!));
+      const gltf = await loader.parseAsync(data, LoaderUtils.extractUrlBase(url));
       // Tez-tez src almashsa, eski so'rov yangisini bosib ketmasin
       if (id !== loadId) {
         disposeObject(gltf.scene);

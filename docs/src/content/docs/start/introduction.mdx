@@ -18,7 +18,7 @@ lite3d is a single HTML element: `<lite-3d>`. It shows any `.glb` or `.gltf` mod
 To keep the page fast, the work is split into three stages.
 
 1. **The page opens.** Only the 4.5 KB element loads. It shows a poster image or empty space, and the page does not slow down.
-2. **The element gets close to the screen.** three.js and the renderer arrive as a separate file (~174 KB). You choose this moment with the [`loading`](../../guides/loading/) attribute.
+2. **The element gets close to the screen.** three.js and the renderer arrive as a separate file (~174 KB), and the model file starts downloading at the same time. You choose this moment with the [`loading`](../../guides/loading/) attribute.
 3. **The model loads.** A progress bar shows at the bottom, then the camera centers on the model and a shadow appears underneath.
 
 ## While running
