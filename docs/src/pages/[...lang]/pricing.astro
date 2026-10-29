@@ -1,0 +1,297 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Wide from '../../components/Wide.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { GITHUB_URL } from '../../data/models';
+import { href, langPaths, type Lang } from '../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const { lang } = Astro.props as { lang: Lang };
+
+const text = {
+  en: {
+    title: 'Pricing',
+    description: 'The lite3d library is free. An image-to-3D service is planned.',
+    intro: 'The library is completely free and will stay that way. The only paid part will be the model-making service, which is still in development.',
+    libTitle: 'Library',
+    libPrice: 'Free',
+    libSub: 'MIT license, commercial projects included',
+    libItems: [
+      'Every feature: hotspots, variants, animations, AR, posters',
+      'Unlimited models and pages',
+      'Models live on your own server, no account needed',
+      'React and Next.js component',
+    ],
+    libCta: 'Install',
+    svcTitle: 'Image to 3D model',
+    svcPrice: 'Planned',
+    svcSub: 'Pricing will be announced at launch',
+    svcItems: [
+      'Upload a product photo, get a web-ready .glb model',
+      'Automatic optimization: files usually shrink by about 80%',
+      'Model hosting and view statistics',
+      'A free tier and a monthly plan are planned',
+    ],
+    svcCta: 'Follow on GitHub',
+    faqTitle: 'Frequently asked questions',
+    faq: [
+      {
+        q: 'Will the library become paid later?',
+        a: 'No. Code released under the MIT license cannot be taken back: you can always use and modify it for free.',
+      },
+      {
+        q: 'Where should I host my models?',
+        a: 'On your own server or any CDN. lite3d does not call any third-party service. The only exception is AR on Android, where the model opens through Google Scene Viewer.',
+      },
+    ],
+    faqLastQ: "What if I don't have a model?",
+    faqLastA: 'Free model sources and ways to make your own are on the',
+    faqLastLink: 'Preparing models',
+    faqLastEnd: 'page.',
+  },
+  uz: {
+    title: 'Narxlar',
+    description: 'lite3d kutubxonasi bepul. Rasmdan 3D model yasaydigan servis rejada.',
+    intro: "Kutubxona butunlay bepul va shunday qoladi. Pullik qism faqat model yasash servisi bo'ladi, u hali ishlab chiqilmoqda.",
+    libTitle: 'Kutubxona',
+    libPrice: 'Bepul',
+    libSub: 'MIT litsenziya, tijoriy loyihalarda ham',
+    libItems: [
+      'Barcha imkoniyatlar: hotspot, variant, animatsiya, AR, poster',
+      'Cheksiz model va sahifa',
+      'Modellar sizning serveringizda turadi, hech qanday hisob kerak emas',
+      'React va Next.js uchun komponent',
+    ],
+    libCta: "O'rnatish",
+    svcTitle: 'Rasmdan 3D modelga',
+    svcPrice: 'Rejada',
+    svcSub: "Narxi servis ishga tushganda e'lon qilinadi",
+    svcItems: [
+      'Mahsulot rasmini yuklaysiz, saytga tayyor .glb model olasiz',
+      'Avtomatik optimizatsiya: hajm odatda 80% ga kichrayadi',
+      "Model hosting va ko'rishlar statistikasi",
+      'Bepul tarif va oylik obuna rejalashtirilgan',
+    ],
+    svcCta: "GitHub'da kuzatish",
+    faqTitle: "Ko'p beriladigan savollar",
+    faq: [
+      {
+        q: "Kutubxona keyinchalik pullik bo'lib qolmaydimi?",
+        a: "Yo'q. MIT litsenziya bilan chiqarilgan kod qaytarib olinmaydi, uni har doim bepul ishlatishingiz va o'zgartirishingiz mumkin.",
+      },
+      {
+        q: 'Modellarni qayerga joylashtirish kerak?',
+        a: "O'zingizning serveringiz yoki istalgan CDN'ga. lite3d hech qanday tashqi servisga murojaat qilmaydi. Faqat Android'da AR ishlatilganda model Google Scene Viewer orqali ochiladi.",
+      },
+    ],
+    faqLastQ: "Model yo'q bo'lsa nima qilaman?",
+    faqLastA: "Bepul modellar manbalari va o'zingiz tayyorlash usullari",
+    faqLastLink: 'Model tayyorlash',
+    faqLastEnd: 'sahifasida.',
+  },
+  ru: {
+    title: 'Цены',
+    description: 'Библиотека lite3d бесплатна. Сервис «фото в 3D» в планах.',
+    intro: 'Библиотека полностью бесплатна и такой останется. Платной будет только услуга создания моделей, она пока в разработке.',
+    libTitle: 'Библиотека',
+    libPrice: 'Бесплатно',
+    libSub: 'Лицензия MIT, в том числе для коммерческих проектов',
+    libItems: [
+      'Все возможности: хотспоты, варианты, анимации, AR, постеры',
+      'Без ограничений по моделям и страницам',
+      'Модели лежат на вашем сервере, аккаунт не нужен',
+      'Компонент для React и Next.js',
+    ],
+    libCta: 'Установить',
+    svcTitle: 'Из фото в 3D-модель',
+    svcPrice: 'В планах',
+    svcSub: 'Цена будет объявлена при запуске',
+    svcItems: [
+      'Загружаете фото товара, получаете готовую для сайта модель .glb',
+      'Автоматическая оптимизация: размер обычно уменьшается примерно на 80%',
+      'Хостинг моделей и статистика просмотров',
+      'Планируются бесплатный тариф и ежемесячная подписка',
+    ],
+    svcCta: 'Следить на GitHub',
+    faqTitle: 'Частые вопросы',
+    faq: [
+      {
+        q: 'Не станет ли библиотека платной?',
+        a: 'Нет. Код, выпущенный под лицензией MIT, нельзя отозвать: вы всегда сможете бесплатно использовать и изменять его.',
+      },
+      {
+        q: 'Где размещать модели?',
+        a: 'На своём сервере или в любом CDN. lite3d не обращается ни к каким сторонним сервисам. Исключение одно: AR на Android открывает модель через Google Scene Viewer.',
+      },
+    ],
+    faqLastQ: 'Что делать, если модели нет?',
+    faqLastA: 'Источники бесплатных моделей и способы сделать свою описаны на странице',
+    faqLastLink: 'Подготовка модели',
+    faqLastEnd: '',
+  },
+}[lang];
+---
+
+<StarlightPage
+  frontmatter={{
+    title: text.title,
+    description: text.description,
+    template: 'splash',
+    hero: { title: text.title },
+    tableOfContents: false,
+  }}
+>
+  <Wide>
+    <header class="intro">
+      <h1 id="_top" data-page-title>{text.title}</h1>
+      <p>{text.intro}</p>
+    </header>
+
+    <div class="plans">
+      <article class="plan current">
+        <h2>{text.libTitle}</h2>
+        <p class="price">{text.libPrice}</p>
+        <p class="sub">{text.libSub}</p>
+        <ul>{text.libItems.map((item) => <li>{item}</li>)}</ul>
+        <a class="btn primary" href={href(lang, '/start/installation/')}>{text.libCta}</a>
+      </article>
+
+      <article class="plan">
+        <h2>{text.svcTitle}</h2>
+        <p class="price">{text.svcPrice}</p>
+        <p class="sub">{text.svcSub}</p>
+        <ul>{text.svcItems.map((item) => <li>{item}</li>)}</ul>
+        <a class="btn" href={GITHUB_URL} rel="noopener">{text.svcCta}</a>
+      </article>
+    </div>
+
+    <section class="faq">
+      <h2>{text.faqTitle}</h2>
+      {
+        text.faq.map((f) => (
+          <>
+            <h3>{f.q}</h3>
+            <p>{f.a}</p>
+          </>
+        ))
+      }
+      <h3>{text.faqLastQ}</h3>
+      <p>
+        {text.faqLastA}{' '}<a href={href(lang, '/guides/preparing-models/')}>{text.faqLastLink}</a>{text.faqLastEnd ? ' ' + text.faqLastEnd : '.'}
+      </p>
+    </section>
+
+    <SiteFooter />
+  </Wide>
+</StarlightPage>
+
+<style>
+  .intro h1,
+  .faq h2 {
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    color: var(--l3-text);
+  }
+  .intro h1 {
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 2.6rem);
+  }
+  .intro p {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--l3-muted);
+    line-height: 1.6;
+  }
+
+  .plans {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 52rem) {
+    .plans {
+      grid-template-columns: 1fr 1fr;
+      max-width: 60rem;
+    }
+  }
+  .plan {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    padding: 1.6rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: var(--l3-surface);
+  }
+  .plan.current {
+    border-color: var(--l3-accent);
+    box-shadow: 0 0 0 3px var(--l3-accent-soft);
+  }
+  .plan h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--l3-text);
+  }
+  .price {
+    margin: 0.3rem 0 0;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--l3-text);
+  }
+  .sub {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    color: var(--l3-muted);
+  }
+  ul {
+    margin: 0.9rem 0 1.2rem;
+    padding-inline-start: 1.1rem;
+    display: grid;
+    gap: 0.45rem;
+    font-size: var(--sl-text-sm);
+    color: var(--l3-text);
+  }
+  .btn {
+    justify-self: start;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: var(--l3-fill);
+    color: var(--l3-text);
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .btn.primary {
+    background: var(--l3-accent);
+    border-color: var(--l3-accent);
+    color: var(--l3-on-accent);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--l3-accent);
+    outline-offset: 2px;
+  }
+
+  .faq {
+    max-width: 44rem;
+  }
+  .faq h2 {
+    font-size: 1.3rem;
+  }
+  .faq h3 {
+    margin: 1.2rem 0 0.3rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--l3-text);
+  }
+  .faq p {
+    margin: 0;
+    color: var(--l3-muted);
+    line-height: 1.6;
+  }
+  .faq a {
+    color: var(--l3-accent);
+  }
+</style>

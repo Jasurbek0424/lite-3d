@@ -1,0 +1,79 @@
+{
+  "name": "lite3d",
+  "version": "0.1.0",
+  "description": "A 4.5 KB web component for 3D product viewers. three.js loads only when the model is needed.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup && tsc -p .",
+    "typecheck": "tsc -p . --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "3d",
+    "web-component",
+    "custom-element",
+    "three",
+    "threejs",
+    "gltf",
+    "glb",
+    "product-viewer",
+    "model-viewer",
+    "ar",
+    "react",
+    "nextjs",
+    "lazy-loading"
+  ],
+  "author": "Jasurbek Khakimbekov",
+  "license": "MIT",
+  "homepage": "https://jasurbek0424.github.io/lite-3d/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jasurbek0424/lite-3d.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jasurbek0424/lite-3d/issues"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "esbuild": "^0.28.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "^0.186.1",
+    "tsup": "^9.0.0",
+    "typescript": "^7.0.2"
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./cdn": "./dist/cdn/lite3d.cdn.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./src/index.ts",
+    "./dist/index.js",
+    "./dist/react.js",
+    "./dist/chunk-*.js"
+  ],
+  "peerDependencies": {
+    "react": ">=18",
+    "three": ">=0.160.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

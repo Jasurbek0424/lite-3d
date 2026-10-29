@@ -1,0 +1,39 @@
+---
+title: Qanday ishlaydi
+description: lite3d nima, qachon kerak va sahifada qanday yuklanadi.
+---
+
+import Viewer from '../../../../components/Viewer.astro';
+
+lite3d — bitta HTML element: `<lite-3d>`. U har qanday `.glb` yoki `.gltf` modelni ko'rsatadi, xuddi `<img>` har qanday rasmni ko'rsatgani kabi. Kamera, yorug'lik va soya modelning o'lchamiga qarab o'zi sozlanadi.
+
+<Viewer src="ToyCar.gltf.json" alt="O'yinchoq mashina" autorotate shadow />
+
+```html
+<lite-3d src="mashina.glb" autorotate shadow></lite-3d>
+```
+
+## Yuklanish tartibi
+
+Sahifa tezligi saqlanishi uchun ish uch bosqichga bo'lingan.
+
+1. **Sahifa ochiladi.** Faqat 4.5 KB'lik element yuklanadi. U poster rasmni yoki bo'sh joyni ko'rsatadi, sahifa sekinlashmaydi.
+2. **Element ekranga yaqinlashadi.** Shunda three.js va renderer alohida fayl bo'lib keladi (~174 KB). Bu vaqtni [`loading`](../../guides/loading/) atributi bilan tanlaysiz.
+3. **Model yuklanadi.** Pastda progress chizig'i ko'rinadi, keyin kamera modelni markazga oladi va ostiga soya tushadi.
+
+## Ish paytida
+
+- Kadr faqat biror narsa o'zgarganda chiziladi: aylantirish, animatsiya, o'lcham o'zgarishi. Model jim turganda GPU ishlamaydi.
+- Element ekrandan chiqsa yoki tab yashirilsa, chizish to'xtaydi.
+- Ekran zichligi 2 bilan cheklangan, shuning uchun 3x ekranli telefonlar ortiqcha yuklanmaydi.
+- Element sahifadan olib tashlansa, GPU xotirasi to'liq tozalanadi.
+
+## Qachon ishlamaydi
+
+WebGL bo'lmasa yoki foydalanuvchi trafikni tejash rejimini (`Save-Data`) yoqqan bo'lsa, 3D yuklanmaydi va `slot="fallback"` ichidagi mazmun ko'rsatiladi:
+
+```html
+<lite-3d src="kreslo.glb">
+  <img slot="fallback" src="kreslo.jpg" alt="Baxmal kreslo" />
+</lite-3d>
+```

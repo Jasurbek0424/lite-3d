@@ -1,0 +1,60 @@
+---
+title: Styling (CSS)
+description: Change size, colors, button text and the look of internal parts.
+---
+
+The element uses Shadow DOM, so your page CSS cannot break its internals. For customization there are CSS variables, `::part()` and slots.
+
+## CSS variables
+
+```css
+lite-3d {
+  --lite3d-aspect: 1 / 1;      /* aspect ratio, default 4 / 3 */
+  --lite3d-bg: #f5f5f5;        /* element background (not the 3D background) */
+  --lite3d-radius: 12px;       /* corner radius */
+  --lite3d-accent: #1b2430;    /* buttons and progress bar */
+  --lite3d-accent-fg: #ffffff; /* button text */
+}
+```
+
+For the 3D scene's own background, use the `background` attribute: `<lite-3d background="#ffffff">`.
+
+## Button text
+
+The built-in buttons say "View in 3D" and "View in AR". To translate them or write your own text, use a slot:
+
+```html
+<lite-3d src="chair.glb" loading="interaction" ar>
+  <span slot="activate-label">Open 3D</span>
+  <span slot="ar-label">See it in your room</span>
+</lite-3d>
+```
+
+## Internal parts
+
+| Part | Element |
+|---|---|
+| `poster` | The poster image |
+| `stage` | The 3D canvas container |
+| `progress` | The loading bar |
+| `activate-button` | The "View in 3D" button (`loading="interaction"`) |
+| `ar-button` | The "View in AR" button |
+| `hotspots` | The hotspot layer |
+| `fallback` | The block shown when WebGL is unavailable |
+
+```css
+lite-3d::part(activate-button) {
+  font-weight: 600;
+  border-radius: 6px;
+}
+```
+
+## States
+
+The element reports its current state in the `data-state` attribute: `idle`, `loading`, `ready`, `error`, `fallback`. You can use it in your own styles:
+
+```css
+lite-3d[data-state='loading'] {
+  cursor: progress;
+}
+```

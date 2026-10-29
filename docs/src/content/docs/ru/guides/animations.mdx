@@ -1,0 +1,173 @@
+---
+title: Анимации
+description: Воспроизведение, пауза и переключение анимаций модели.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import Viewer from '../../../../components/Viewer.astro';
+
+Файл модели может хранить несколько анимаций: открывание двери, вращение механизма, ходьбу персонажа. `autoplay` запускает первую автоматически, а `animation-name` выбирает конкретную.
+
+<Viewer
+  src="Robot.gltf.json"
+  alt="Робот с анимациями ходьбы и танца"
+  shadow
+  autoplay
+  animation-name="Walking"
+  controls="animations"
+/>
+
+```html
+<lite-3d src="robot.glb" autoplay animation-name="Walking"></lite-3d>
+```
+
+## Управление
+
+```js
+el.animations;      // ['Dance', 'Death', 'Idle', 'Jump', ...] — в порядке файла
+el.play('Dance');   // перейти к другой анимации
+el.pause();
+el.play();          // продолжить с места остановки
+el.paused;          // true | false
+```
+
+| Атрибут | По умолчанию | Значение |
+|---|---|---|
+| `autoplay` | выкл. | Запустить сразу после загрузки |
+| `animation-name` | первая | Какая анимация |
+| `animation-speed` | `1` | Скорость: `0.5` медленнее, `2` быстрее |
+| `animation-loop` | вкл. | При `"false"` проигрывается один раз и останавливается на последнем кадре |
+
+## Автоматический список движений
+
+Писать названия анимаций вручную не нужно: после загрузки модели в поле `detail.animations` события `load` приходят все анимации файла. Пример выше и демо на главной работают по такому правилу:
+
+| В модели | Как показывается |
+|---|---|
+| анимаций нет | надпись «Движений нет» |
+| 1–4 | все кнопками |
+| 5 и больше | первые 4 кнопками, остальные в списке «Ещё движения» |
+
+Список приходит в порядке файла. Чтобы поменять, какие движения станут кнопками, поставьте их первыми в Blender или отсортируйте массив `names` сами.
+
+<Tabs syncKey="framework">
+<TabItem label="HTML">
+
+```html
+<lite-3d id="robot" src="robot.glb" autoplay></lite-3d>
+<div id="moves"></div>
+
+<script type="module">
+  const el = document.getElementById('robot');
+  const box = document.getElementById('moves');
+  const MAX = 4;
+
+  el.addEventListener('load', (e) => {
+    const names = e.detail.animations;
+    if (!names.length) {
+      box.textContent = 'Движений нет';
+      return;
+    }
+
+    const play = (name) => {
+      el.setAttribute('animation-name', name);
+      el.play(name);
+    };
+
+    const buttons = names.slice(0, MAX).map((name) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.onclick = () => play(name);
+      return b;
+    });
+    box.replaceChildren(...buttons);
+
+    const rest = names.slice(MAX);
+    if (rest.length) {
+      const more = document.createElement('select');
+      more.setAttribute('aria-label', 'Ещё движения');
+      more.append(new Option('Ещё движения', ''), ...rest.map((n) => new Option(n, n)));
+      more.onchange = () => more.value && play(more.value);
+      box.append(more);
+    }
+  });
+</script>
+```
+
+</TabItem>
+<TabItem label="React">
+
+```tsx
+'use client';
+import { useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+
+const MAX = 4;
+
+export function Robot() {
+  const [names, setNames] = useState<string[] | null>(null);
+  const [current, setCurrent] = useState<string>();
+
+  const buttons = names?.slice(0, MAX) ?? [];
+  const rest = names?.slice(MAX) ?? [];
+
+  return (
+    <>
+      <Lite3D src="/robot.glb" autoplay animationName={current} onLoad={(e) => setNames(e.detail.animations)} />
+
+      {names?.length === 0 && <p>Движений нет</p>}
+      {buttons.map((n) => (
+        <button key={n} aria-pressed={n === current} onClick={() => setCurrent(n)}>
+          {n}
+        </button>
+      ))}
+      {rest.length > 0 && (
+        <select
+          aria-label="Ещё движения"
+          value={current && rest.includes(current) ? current : ''}
+          onChange={(e) => e.target.value && setCurrent(e.target.value)}
+        >
+          <option value="">Ещё движения</option>
+          {rest.map((n) => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+      )}
+    </>
+  );
+}
+```
+
+Когда меняется `animationName`, lite3d сам переключается на новую анимацию, вызывать `play()` не нужно.
+
+</TabItem>
+</Tabs>
+
+## Как добавить новые движения
+
+Анимации хранятся внутри файла модели, lite3d их только воспроизводит. Поэтому новое движение добавляется в 3D-редакторе, а не в коде:
+
+- **Человекоподобный персонаж:** загрузите модель в [Mixamo](https://www.mixamo.com/), он сам поставит скелет. Скачайте нужные движения (ходьба, бег, танец) и соберите их в один `.glb` в Blender. Каждое движение экспортируется отдельным именованным клипом.
+- **Животное или механизм:** анимируйте вручную в Blender через скелет или ключевые кадры. Простые движения вроде открывания двери или поворота стрелки делаются парой ключевых кадров.
+
+Когда файл готов, новые движения сами появятся в списке выше. О сжатии файла — на странице [Подготовка модели](../../guides/preparing-models/).
+
+## Одноразовое движение
+
+Дверь или крышка коробки должны открыться один раз и остаться открытыми:
+
+```html
+<lite-3d src="cabinet.glb" autoplay animation-name="Open" animation-loop="false"></lite-3d>
+```
+
+Об окончании сообщает событие `animation-finish`:
+
+```js
+el.addEventListener('animation-finish', (e) => {
+  console.log(e.detail.name, 'закончилась');
+});
+```
+
+:::note
+Если у пользователя в системе включено уменьшение движения (`prefers-reduced-motion`), `autoplay` не срабатывает. `play()` при этом работает, потому что его вызывает сам пользователь.
+:::

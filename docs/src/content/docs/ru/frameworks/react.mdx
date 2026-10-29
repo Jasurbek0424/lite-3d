@@ -1,0 +1,80 @@
+---
+title: React
+description: React-компонент с типами и событиями.
+---
+
+`lite3d/react` — тонкая обёртка над `<lite-3d>`. Она переводит имена атрибутов в стиль React (`autorotate-speed` → `autorotateSpeed`), превращает события в props и даёт типы TypeScript. Работает с React 18 и 19.
+
+```sh
+npm i lite3d three
+```
+
+```tsx
+import { Lite3D } from 'lite3d/react';
+
+export function ProductViewer() {
+  return (
+    <Lite3D
+      src="/chair.glb"
+      poster="/chair.webp"
+      alt="Бархатное кресло"
+      autorotate
+      shadow
+      onLoad={(e) => console.log('загружено за', e.detail.ms, 'мс')}
+    />
+  );
+}
+```
+
+## Хотспоты
+
+Хотспоты передаются обычными `children`:
+
+```tsx
+<Lite3D src="/chair.glb">
+  <button slot="hotspot" data-position="0.0068 0.597 -0.1446">
+    Бархатная ткань
+  </button>
+</Lite3D>
+```
+
+Так же задаётся текст кнопки: `<span slot="activate-label">Смотреть в 3D</span>`.
+
+## Вызов методов
+
+`ref` даёт сам элемент:
+
+```tsx
+import { useRef, useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+import type { Lite3DElement } from 'lite3d';
+
+export function ColorPicker() {
+  const ref = useRef<Lite3DElement>(null);
+  const [variants, setVariants] = useState<string[]>([]);
+  const [variant, setVariant] = useState<string>();
+
+  return (
+    <>
+      <Lite3D ref={ref} src="/watch.glb" variant={variant} onLoad={(e) => setVariants(e.detail.variants)} />
+      {variants.map((v) => (
+        <button key={v} onClick={() => setVariant(v)} aria-pressed={v === variant}>
+          {v}
+        </button>
+      ))}
+      <button onClick={() => ref.current?.resetCamera()}>Сбросить камеру</button>
+    </>
+  );
+}
+```
+
+## Props
+
+У каждого атрибута есть имя в camelCase: `autorotateSpeed`, `cameraControls`, `iosSrc`, `animationName` и так далее. Булевы атрибуты (`autorotate`, `shadow`, `ar`, `autoplay`) принимают `true`/`false`.
+
+| Event prop | `e.detail` |
+|---|---|
+| `onLoad` | `{ url, ms, variants, animations, materials }` |
+| `onProgress` | `{ progress }` (от 0 до 1) |
+| `onError` | `{ error }` |
+| `onAnimationFinish` | `{ name }` |

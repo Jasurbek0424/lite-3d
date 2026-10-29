@@ -1,0 +1,204 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import Showcase from '../../components/Showcase.astro';
+import SizeChart from '../../components/SizeChart.astro';
+import Wide from '../../components/Wide.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { href, langPaths, type Lang } from '../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const { lang } = Astro.props as { lang: Lang };
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const text = {
+  en: {
+    description: 'A lightweight web component for putting a 3D product viewer on your site with a single tag.',
+    startTitle: 'On your site in five minutes',
+    startText: 'Install from npm, drop the model into a folder and write one tag. Camera and lighting set themselves up.',
+    startLink: 'Start installing',
+    fwTitle: 'React, Next.js or plain HTML',
+    fwText:
+      'It is a regular HTML element, so it works in any framework. React gets a ready-made typed component, and in Next.js you can use it straight from a server component.',
+    fwReact: 'React guide',
+    fwNext: 'Next.js guide',
+    and: 'and',
+    file: 'chair',
+    nextComment: '// app/product/page.tsx — works in a server component too',
+  },
+  uz: {
+    description: "Saytga 3D mahsulot ko'rsatkichini bitta teg bilan qo'yish uchun yengil web komponent.",
+    startTitle: 'Saytingizga besh daqiqada',
+    startText: "npm'dan o'rnating, modelni papkaga tashlang va bitta teg yozing. Kamera va yorug'lik o'zi sozlanadi.",
+    startLink: "O'rnatishni boshlash",
+    fwTitle: 'React, Next.js yoki oddiy HTML',
+    fwText:
+      "Bu oddiy HTML element, shuning uchun istalgan frameworkda ishlaydi. React uchun tiplari bor tayyor komponent bor, Next.js'da server komponent ichida ham to'g'ridan-to'g'ri ishlatsa bo'ladi.",
+    fwReact: "React qo'llanmasi",
+    fwNext: "Next.js qo'llanmasi",
+    and: 'va',
+    file: 'kreslo',
+    nextComment: '// app/mahsulot/page.tsx — server komponentda ham ishlaydi',
+  },
+  ru: {
+    description: 'Лёгкий веб-компонент, чтобы поставить на сайт 3D-просмотр товара одним тегом.',
+    startTitle: 'На вашем сайте за пять минут',
+    startText: 'Установите из npm, положите модель в папку и напишите один тег. Камера и свет настроятся сами.',
+    startLink: 'Перейти к установке',
+    fwTitle: 'React, Next.js или обычный HTML',
+    fwText:
+      'Это обычный HTML-элемент, поэтому он работает в любом фреймворке. Для React есть готовый типизированный компонент, а в Next.js его можно использовать прямо в серверном компоненте.',
+    fwReact: 'Руководство по React',
+    fwNext: 'Руководство по Next.js',
+    and: 'и',
+    file: 'chair',
+    nextComment: '// app/product/page.tsx — работает и в серверном компоненте',
+  },
+}[lang];
+
+const html = `<script type="module" src="https://cdn.jsdelivr.net/npm/lite3d/dist/cdn/lite3d.cdn.js"></script>
+
+<lite-3d src="/${text.file}.glb" autorotate shadow></lite-3d>`;
+const react = `import { Lite3D } from 'lite3d/react';
+
+export function Product() {
+  return <Lite3D src="/${text.file}.glb" autorotate shadow />;
+}`;
+const next = `${text.nextComment}
+import { Lite3D } from 'lite3d/react';
+
+export default function Page() {
+  return <Lite3D src="/${text.file}.glb" poster="/${text.file}.webp" shadow />;
+}`;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'lite3d',
+    description: text.description,
+    template: 'splash',
+    hero: { title: 'lite3d' },
+    tableOfContents: false,
+  }}
+>
+  <Wide>
+    <Showcase />
+
+    <div class="row">
+      <SizeChart card />
+      <aside class="start">
+        <img src={`${base}/posters/chair.webp`} alt="" width="120" height="90" />
+        <div>
+          <h2>{text.startTitle}</h2>
+          <p>{text.startText}</p>
+          <a href={href(lang, '/start/installation/')}>{text.startLink}</a>
+        </div>
+      </aside>
+    </div>
+
+    <section class="frameworks">
+      <div class="fw-text">
+        <h2>{text.fwTitle}</h2>
+        <p>{text.fwText}</p>
+        <p>
+          <a href={href(lang, '/frameworks/react/')}>{text.fwReact}</a>{' '}{text.and}{' '}
+          <a href={href(lang, '/frameworks/nextjs/')}>{text.fwNext}</a>
+        </p>
+      </div>
+      <div class="fw-code">
+        <Tabs syncKey="framework">
+          <TabItem label="HTML"><Code code={html} lang="html" /></TabItem>
+          <TabItem label="React"><Code code={react} lang="tsx" /></TabItem>
+          <TabItem label="Next.js"><Code code={next} lang="tsx" /></TabItem>
+        </Tabs>
+      </div>
+    </section>
+
+    <SiteFooter />
+  </Wide>
+</StarlightPage>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  @media (min-width: 64rem) {
+    .row {
+      grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr);
+    }
+  }
+  .start {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+    align-content: center;
+    padding: 1.6rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: linear-gradient(160deg, var(--l3-accent-soft), var(--l3-surface) 70%);
+    box-shadow: var(--l3-shadow);
+  }
+  .start img {
+    width: 5.5rem;
+    height: auto;
+  }
+  .start h2,
+  .fw-text h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--l3-text);
+  }
+  .fw-text h2 {
+    font-size: 1.3rem;
+  }
+  .start p,
+  .fw-text p {
+    margin: 0 0 0.9rem;
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+    color: var(--l3-muted);
+  }
+  .fw-text p {
+    font-size: var(--sl-text-base);
+  }
+  .start a {
+    display: inline-block;
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: var(--l3-fill);
+    color: var(--l3-text);
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .start a:hover {
+    border-color: var(--l3-accent);
+  }
+  .fw-text a {
+    color: var(--l3-accent);
+  }
+
+  .frameworks {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.6rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: var(--l3-surface);
+  }
+  @media (min-width: 64rem) {
+    .frameworks {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+      gap: 2.5rem;
+      align-items: center;
+    }
+  }
+</style>

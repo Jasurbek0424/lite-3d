@@ -1,0 +1,88 @@
+---
+/**
+ * Hujjatdagi jonli misol. Qolgan barcha prop'lar <lite-3d> atributlariga o'tadi.
+ * controls="variants" | "animations" — load'dan keyin modeldagi nomlardan tugmalar yasaydi.
+ * Animatsiyalar bosh sahifadagi qoida bilan chiqadi: 4 tagacha tugma, qolgani "Yana harakatlar" ro'yxatida.
+ */
+import { langFromPath, t } from '../i18n';
+
+interface Props {
+  src: string;
+  controls?: 'variants' | 'animations';
+  /** Sayt ichidagi rasm: /posters/car.webp. Base yo'li o'zi qo'shiladi. */
+  poster?: string;
+  /**
+   * Hotspot'lar ma'lumot sifatida: Astro `slot="..."` atributini o'z slot'i deb
+   * tushunadi, shuning uchun tugmalarni MDX'da emas, shu yerda chizamiz.
+   */
+  hotspots?: { label: string; position: string; normal?: string }[];
+  [attr: string]: unknown;
+}
+const { src, controls, poster, hotspots = [], ...attrs } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const tr = t(langFromPath(Astro.url.pathname));
+const url = `${base}/models/${src}`;
+---
+
+<figure class="l3-viewer not-content" data-controls={controls}>
+  <lite-3d src={url} poster={poster && base + poster} {...attrs}>
+    <span slot="activate-label">{tr['viewer.activate']}</span>
+    <span slot="ar-label">{tr['viewer.ar']}</span>
+    {
+      hotspots.map((h) => (
+        <button slot="hotspot" class="l3-hs" type="button" data-position={h.position} data-normal={h.normal}>
+          {h.label}
+        </button>
+      ))
+    }
+  </lite-3d>
+  {
+    controls && (
+      <div
+        class="l3-controls"
+        role="group"
+        aria-label={controls === 'variants' ? tr['viewer.variants'] : tr['moves.label']}
+        data-original={tr['viewer.original']}
+      />
+    )
+  }
+</figure>
+
+<script>
+  import 'lite3d';
+  import { renderMoves } from '../scripts/moves';
+
+  for (const fig of document.querySelectorAll<HTMLElement>('.l3-viewer[data-controls]')) {
+    const el = fig.querySelector('lite-3d')!;
+    const box = fig.querySelector<HTMLElement>('.l3-controls')!;
+
+    el.addEventListener('load', (e) => {
+      const { detail } = e as CustomEvent<{ variants: string[]; animations: string[] }>;
+
+      if (fig.dataset.controls === 'animations') {
+        const playing = el.hasAttribute('autoplay') ? (el.getAttribute('animation-name') ?? detail.animations[0] ?? null) : null;
+        renderMoves(box, detail.animations, playing, (name) => {
+          el.setAttribute('animation-name', name);
+          el.play(name);
+        });
+        return;
+      }
+
+      const current = el.getAttribute('variant');
+      box.replaceChildren(
+        ...[null, ...detail.variants].map((name) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = name ?? box.dataset.original!;
+          b.setAttribute('aria-pressed', String(name === current));
+          b.addEventListener('click', () => {
+            box.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+            if (name) el.setAttribute('variant', name);
+            else el.removeAttribute('variant');
+          });
+          return b;
+        }),
+      );
+    });
+  }
+</script>

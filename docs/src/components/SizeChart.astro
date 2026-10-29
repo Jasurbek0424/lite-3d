@@ -1,0 +1,143 @@
+---
+/** gzip -9 o'lchamlari, esbuild minify. Raqamlar README bilan bir xil bo'lishi kerak. */
+import { langFromPath, t } from '../i18n';
+
+interface Props {
+  /** card — bosh sahifadagi karta ko'rinishi; aks holda hujjat ichidagi oddiy grafik */
+  card?: boolean;
+}
+const { card = false } = Astro.props;
+const tr = t(langFromPath(Astro.url.pathname));
+const rows = [
+  {
+    stage: tr['size.stage1'],
+    items: [
+      { name: 'lite3d', kb: 4.5, ours: true },
+      { name: 'model-viewer', kb: 294.8 },
+    ],
+  },
+  {
+    stage: tr['size.stage2'],
+    items: [
+      { name: 'lite3d', kb: 178.4, ours: true },
+      { name: 'model-viewer', kb: 294.8 },
+    ],
+  },
+];
+const max = 294.8;
+---
+
+<section class:list={['size not-content', { card }]}>
+  <div class="text">
+    <h2>{tr['size.title']}</h2>
+    <p>{tr['size.text']}</p>
+    <p class="note">{tr['size.note']}</p>
+  </div>
+  <div class="bars">
+    {
+      rows.map((row) => (
+        <div class="group">
+          <p class="stage">{row.stage}</p>
+          {row.items.map((it) => (
+            <div class:list={['row', { ours: it.ours }]}>
+              <span class="name">{it.name}</span>
+              <span class="track">
+                <span class="fill" style={`width:${Math.max((it.kb / max) * 100, 1.2)}%`} />
+              </span>
+              <span class="val">{it.kb.toFixed(1)} KB</span>
+            </div>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .size {
+    display: grid;
+    gap: 1.5rem;
+    margin-block: 1.5rem;
+  }
+  .card {
+    margin: 0;
+    padding: 1.6rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: var(--l3-surface);
+    box-shadow: var(--l3-shadow);
+  }
+  @media (min-width: 52rem) {
+    .card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 2.5rem;
+    }
+    .card .bars {
+      padding-inline-start: 2.5rem;
+    }
+  }
+  h2 {
+    margin: 0 0 0.6rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--l3-text);
+  }
+  .text p {
+    margin: 0 0 0.75rem;
+    color: var(--l3-muted);
+    line-height: 1.6;
+  }
+  .text .note {
+    margin: 0;
+    font-size: var(--sl-text-xs);
+  }
+  .bars {
+    display: grid;
+    gap: 1.25rem;
+    align-content: center;
+  }
+  .group {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .stage {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    color: var(--l3-text);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 6.75rem minmax(0, 1fr) 4.75rem;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: var(--sl-text-sm);
+    color: var(--l3-muted);
+  }
+  .row.ours {
+    color: var(--l3-text);
+    font-weight: 500;
+  }
+  .track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--l3-fill);
+    overflow: hidden;
+  }
+  .fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--l3-muted);
+    opacity: 0.55;
+  }
+  .ours .fill {
+    background: var(--l3-accent);
+    opacity: 1;
+  }
+  .val {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

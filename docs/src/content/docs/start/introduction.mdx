@@ -1,0 +1,39 @@
+---
+title: How it works
+description: What lite3d is, when to use it and how it loads on the page.
+---
+
+import Viewer from '../../../components/Viewer.astro';
+
+lite3d is a single HTML element: `<lite-3d>`. It shows any `.glb` or `.gltf` model the way `<img>` shows any image. Camera, lighting and shadow adjust to the model size on their own.
+
+<Viewer src="ToyCar.gltf.json" alt="Toy car" autorotate shadow />
+
+```html
+<lite-3d src="car.glb" autorotate shadow></lite-3d>
+```
+
+## Loading order
+
+To keep the page fast, the work is split into three stages.
+
+1. **The page opens.** Only the 4.5 KB element loads. It shows a poster image or empty space, and the page does not slow down.
+2. **The element gets close to the screen.** three.js and the renderer arrive as a separate file (~174 KB). You choose this moment with the [`loading`](../../guides/loading/) attribute.
+3. **The model loads.** A progress bar shows at the bottom, then the camera centers on the model and a shadow appears underneath.
+
+## While running
+
+- A frame is drawn only when something changes: rotation, animation, resizing. When the model is still, the GPU is idle.
+- Rendering stops when the element leaves the screen or the tab is hidden.
+- Pixel density is capped at 2, so phones with 3x screens are not overloaded.
+- When the element is removed from the page, GPU memory is fully released.
+
+## When it does not run
+
+Without WebGL, or when the user has turned on data saving (`Save-Data`), 3D is not loaded and the content of `slot="fallback"` is shown instead:
+
+```html
+<lite-3d src="chair.glb">
+  <img slot="fallback" src="chair.jpg" alt="Velvet chair" />
+</lite-3d>
+```

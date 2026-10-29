@@ -1,0 +1,55 @@
+---
+title: Preparing models
+description: Find a model, shrink it and smooth out hard edges.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+No matter how light the viewer is, a 5 MB model still slows the page down. For a website, a model should usually be around 0.5–2 MB.
+
+## Where to get one
+
+- **Free models:** Sketchfab (the downloadable ones), Poly Haven, Khronos glTF Sample Assets. Check the license: a model marked "personal use only" is not fit for a public site.
+- **Make your own:** Blender → File → Export → glTF Binary (`.glb`).
+- **From a photo with AI:** Tripo, Meshy or the open-source TRELLIS.
+- **Scan with a phone:** apps like Polycam.
+
+## Shrinking the file
+
+```sh
+npx @gltf-transform/cli optimize model.glb model-opt.glb \
+  --compress meshopt --texture-compress webp --texture-size 2048 --simplify false
+```
+
+- `--compress meshopt` compresses geometry. lite3d decodes it on its own, no extra setup needed.
+- `--texture-compress webp` converts textures to WebP; this is usually where the biggest savings are.
+- `--texture-size 2048` scales down larger textures. Keep 2048 for products with fine print (a watch dial, a label); 1024 is enough for plain objects.
+- `--simplify false` leaves geometry as is. Simplifying reduces size but creates visible edges on smooth surfaces.
+
+The demo models shrank by 70–86% this way.
+
+## Smoothing hard edges
+
+Some models are drawn in a deliberate "low-poly" style: few triangles, flat faces. On a website they look angular. The repository's `scripts/subdivide.mjs` splits every triangle into 4 and pushes the new points onto a curved surface. Skeletal animation, UVs and morph targets are preserved.
+
+<Steps>
+
+1. Smooth (2 levels, 16 times more triangles):
+
+   ```sh
+   node scripts/subdivide.mjs robot.glb robot-smooth.glb 2
+   ```
+
+2. Compress:
+
+   ```sh
+   npx @gltf-transform/cli optimize robot-smooth.glb robot-opt.glb --compress meshopt --simplify false
+   ```
+
+</Steps>
+
+The robot in these docs was prepared this way: from 3,237 triangles to 51,792, and 411 KB after compression.
+
+:::caution
+Smoothing changes the model's shape: edges get rounded. So it does not suit sharp-cornered products (furniture, boxes, phones), only organic shapes (characters, animals, toys).
+:::

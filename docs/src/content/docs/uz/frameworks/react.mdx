@@ -1,0 +1,80 @@
+---
+title: React
+description: Tiplar va event'lar bilan React komponenti.
+---
+
+`lite3d/react` — `<lite-3d>` ustidagi yupqa wrapper. U atribut nomlarini React uslubiga o'giradi (`autorotate-speed` → `autorotateSpeed`), event'larni prop qiladi va TypeScript tiplarini beradi. React 18 va 19 bilan ishlaydi.
+
+```sh
+npm i lite3d three
+```
+
+```tsx
+import { Lite3D } from 'lite3d/react';
+
+export function ProductViewer() {
+  return (
+    <Lite3D
+      src="/kreslo.glb"
+      poster="/kreslo.webp"
+      alt="Baxmal kreslo"
+      autorotate
+      shadow
+      onLoad={(e) => console.log('yuklandi', e.detail.ms, 'ms')}
+    />
+  );
+}
+```
+
+## Hotspot'lar
+
+Hotspot'lar oddiy `children`:
+
+```tsx
+<Lite3D src="/kreslo.glb">
+  <button slot="hotspot" data-position="0.0068 0.597 -0.1446">
+    Baxmal mato
+  </button>
+</Lite3D>
+```
+
+Tugma matni ham shunday beriladi: `<span slot="activate-label">3D ko'rish</span>`.
+
+## Metodlarni chaqirish
+
+`ref` to'g'ridan-to'g'ri elementni beradi:
+
+```tsx
+import { useRef, useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+import type { Lite3DElement } from 'lite3d';
+
+export function ColorPicker() {
+  const ref = useRef<Lite3DElement>(null);
+  const [variants, setVariants] = useState<string[]>([]);
+  const [variant, setVariant] = useState<string>();
+
+  return (
+    <>
+      <Lite3D ref={ref} src="/soat.glb" variant={variant} onLoad={(e) => setVariants(e.detail.variants)} />
+      {variants.map((v) => (
+        <button key={v} onClick={() => setVariant(v)} aria-pressed={v === variant}>
+          {v}
+        </button>
+      ))}
+      <button onClick={() => ref.current?.resetCamera()}>Kamerani qaytarish</button>
+    </>
+  );
+}
+```
+
+## Prop'lar
+
+Har bir atributning camelCase nomi bor: `autorotateSpeed`, `cameraControls`, `iosSrc`, `animationName` va hokazo. Boolean atributlar (`autorotate`, `shadow`, `ar`, `autoplay`) `true`/`false` qabul qiladi.
+
+| Event prop | `e.detail` |
+|---|---|
+| `onLoad` | `{ url, ms, variants, animations, materials }` |
+| `onProgress` | `{ progress }` (0 dan 1 gacha) |
+| `onError` | `{ error }` |
+| `onAnimationFinish` | `{ name }` |

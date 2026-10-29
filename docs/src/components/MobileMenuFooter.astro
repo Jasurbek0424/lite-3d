@@ -1,0 +1,43 @@
+---
+/**
+ * Hujjat sahifalarida telefonda bitta menyu tugmasi qoladi (Starlight'niki).
+ * Saytning asosiy bo'limlari shu menyuning pastida chiqadi; til va mavzu header'da bor.
+ */
+import { GITHUB_URL } from '../data/models';
+import { href, langFromPath, t } from '../i18n';
+
+const lang = langFromPath(Astro.url.pathname);
+const tr = t(lang);
+const links = [
+  { href: href(lang, '/'), label: tr['nav.demo'] },
+  { href: href(lang, '/models/'), label: tr['nav.models'] },
+  { href: href(lang, '/pricing/'), label: tr['nav.pricing'] },
+  { href: GITHUB_URL, label: 'GitHub' },
+];
+---
+
+<nav class="site-links" aria-label={tr['nav.label']}>
+  {links.map((l) => <a href={l.href}>{l.label}</a>)}
+</nav>
+
+<style>
+  .site-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-block: 1rem;
+  }
+  a {
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: var(--l3-fill);
+    color: var(--l3-text);
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--l3-accent);
+    outline-offset: 2px;
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+import { GITHUB_URL } from '../data/models';
+import { href, langFromPath, t } from '../i18n';
+
+const lang = langFromPath(Astro.url.pathname);
+const tr = t(lang);
+---
+
+<footer class="site-footer not-content">
+  <span>{tr['footer.license']}</span>
+  <nav aria-label={tr['footer.label']}>
+    <a href={href(lang, '/about/')}>{tr['footer.about']}</a>
+    <a href={href(lang, '/models/')}>{tr['footer.models']}</a>
+    <a href={GITHUB_URL} rel="noopener">GitHub</a>
+  </nav>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    font-size: var(--sl-text-sm);
+    color: var(--l3-muted);
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+  a {
+    color: var(--l3-muted);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--l3-text);
+  }
+</style>

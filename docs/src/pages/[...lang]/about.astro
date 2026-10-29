@@ -1,0 +1,155 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Wide from '../../components/Wide.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { href, langPaths, type Lang } from '../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const { lang } = Astro.props as { lang: Lang };
+
+const text = {
+  en: {
+    title: 'About',
+    description: 'Why lite3d was built and where it is heading.',
+    lead: 'lite3d started with online stores. Showing a product in 3D is a good idea, but existing solutions load hundreds of kilobytes as soon as the page opens, and the models themselves are often 4–5 MB.',
+    goalTitle: 'What we are building',
+    goal: 'The goal is simple: a developer writes one tag and the library handles the rest. Camera, lighting and shadow adjust to the model size on their own. The 3D engine loads only when it is needed, so the page stays fast.',
+    nextTitle: 'Next steps',
+    next: [
+      'Publish the package to npm and open the code on GitHub',
+      'Examples for Vue and Svelte',
+      'Camera presets: "front", "side", "top" in one click',
+    ],
+    nextService: 'Image-to-3D service: upload a product photo and get a web-ready model.',
+    more: 'Details',
+    authorTitle: 'Author',
+    author: 'Jasurbek Khakimbekov. The project started in October 2026 and is distributed under the MIT license.',
+    creditsTitle: 'Model authors',
+    credits: 'The sample models on this site are under open licenses. The author and license of each model are listed on the',
+    creditsLink: 'Models',
+    creditsEnd: 'page.',
+  },
+  uz: {
+    title: 'Loyiha haqida',
+    description: 'lite3d nima uchun yaratildi va qayerga ketyapti.',
+    lead: "lite3d onlayn do'konlar uchun boshlangan. Mahsulotni 3D'da ko'rsatish g'oyasi yaxshi, lekin mavjud yechimlar sahifa ochilishi bilan yuzlab kilobayt yuklaydi, modellarning o'zi esa ko'pincha 4–5 MB bo'ladi.",
+    goalTitle: 'Nima qilmoqchimiz',
+    goal: "Maqsad oddiy: dasturchi bitta teg yozadi, qolganini kutubxona hal qiladi. Kamera, yorug'lik va soya model o'lchamiga qarab o'zi sozlanadi. Sahifa sekinlashmasligi uchun 3D dvigatel faqat kerak bo'lganda yuklanadi.",
+    nextTitle: 'Keyingi qadamlar',
+    next: [
+      "Paketni npm'ga chiqarish va kodni GitHub'da ochish",
+      'Vue va Svelte uchun misollar',
+      'Kamera presetlari: bir bosishda "old", "yon", "yuqori" ko\'rinish',
+    ],
+    nextService: 'Rasmdan 3D modelga servisi: mahsulot rasmini yuklab, saytga tayyor model olish.',
+    more: 'Batafsil',
+    authorTitle: 'Muallif',
+    author: 'Jasurbek Khakimbekov. Loyiha 2026-yil oktabrda boshlangan va MIT litsenziya bilan tarqatiladi.',
+    creditsTitle: 'Modellar mualliflari',
+    credits: "Saytdagi namunaviy modellar ochiq litsenziyalar ostida. Har bir modelning muallifi va litsenziyasi",
+    creditsLink: 'Modellar',
+    creditsEnd: "sahifasida ko'rsatilgan.",
+  },
+  ru: {
+    title: 'О проекте',
+    description: 'Зачем создан lite3d и куда он движется.',
+    lead: 'lite3d начинался для интернет-магазинов. Показывать товар в 3D — хорошая идея, но готовые решения грузят сотни килобайт сразу при открытии страницы, а сами модели часто весят 4–5 МБ.',
+    goalTitle: 'Что мы делаем',
+    goal: 'Цель простая: разработчик пишет один тег, остальное делает библиотека. Камера, свет и тень сами подстраиваются под размер модели. 3D-движок загружается только когда нужен, чтобы страница не тормозила.',
+    nextTitle: 'Следующие шаги',
+    next: [
+      'Опубликовать пакет в npm и открыть код на GitHub',
+      'Примеры для Vue и Svelte',
+      'Пресеты камеры: вид «спереди», «сбоку», «сверху» в один клик',
+    ],
+    nextService: 'Сервис «из фото в 3D»: загружаете фото товара и получаете модель, готовую для сайта.',
+    more: 'Подробнее',
+    authorTitle: 'Автор',
+    author: 'Jasurbek Khakimbekov. Проект начат в октябре 2026 года и распространяется под лицензией MIT.',
+    creditsTitle: 'Авторы моделей',
+    credits: 'Демонстрационные модели на сайте распространяются под открытыми лицензиями. Автор и лицензия каждой модели указаны на странице',
+    creditsLink: 'Модели',
+    creditsEnd: '',
+  },
+}[lang];
+---
+
+<StarlightPage
+  frontmatter={{
+    title: text.title,
+    description: text.description,
+    template: 'splash',
+    hero: { title: text.title },
+    tableOfContents: false,
+  }}
+>
+  <Wide>
+    <article class="about">
+      <h1 id="_top" data-page-title>{text.title}</h1>
+
+      <p class="lead">{text.lead}</p>
+
+      <h2>{text.goalTitle}</h2>
+      <p>{text.goal}</p>
+
+      <h2>{text.nextTitle}</h2>
+      <ul>
+        {text.next.map((item) => <li>{item}</li>)}
+        <li>
+          {text.nextService}{' '}<a href={href(lang, '/pricing/')}>{text.more}</a>
+        </li>
+      </ul>
+
+      <h2>{text.authorTitle}</h2>
+      <p>{text.author}</p>
+
+      <h2>{text.creditsTitle}</h2>
+      <p>
+        {text.credits}{' '}<a href={href(lang, '/models/')}>{text.creditsLink}</a>{text.creditsEnd ? ' ' + text.creditsEnd : '.'}
+      </p>
+    </article>
+
+    <SiteFooter />
+  </Wide>
+</StarlightPage>
+
+<style>
+  .about {
+    max-width: 44rem;
+  }
+  h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    color: var(--l3-text);
+  }
+  .lead {
+    font-size: var(--sl-text-lg);
+    color: var(--l3-text);
+  }
+  h2 {
+    margin: 2rem 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--l3-text);
+  }
+  p,
+  li {
+    color: var(--l3-muted);
+    line-height: 1.65;
+  }
+  p {
+    margin: 0 0 0.75rem;
+  }
+  ul {
+    padding-inline-start: 1.1rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+  a {
+    color: var(--l3-accent);
+  }
+</style>

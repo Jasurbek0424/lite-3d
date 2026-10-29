@@ -1,0 +1,54 @@
+---
+title: Next.js
+description: Использование с App Router и серверными компонентами.
+---
+
+Файл `lite3d/react` начинается с директивы `'use client'`. Поэтому компонент можно использовать прямо внутри серверного компонента, отдельная клиентская обёртка не нужна.
+
+```tsx title="app/product/[id]/page.tsx"
+import { Lite3D } from 'lite3d/react';
+
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return (
+    <main>
+      <h1>Товар</h1>
+      <Lite3D src={`/models/${id}.glb`} poster={`/models/${id}.webp`} alt="Товар, 3D" shadow />
+    </main>
+  );
+}
+```
+
+## Что происходит на сервере
+
+Сервер пишет в HTML тег `<lite-3d src="..." poster="...">`. Постер виден сразу вместе со страницей, а 3D загружается в браузере, когда элемент приближается к экрану. Импортировать `lite3d` на сервере безопасно: элемент регистрируется только в браузере.
+
+## Файлы моделей
+
+Положите `.glb` в папку `public/models/`. Они будут доступны по адресу `/models/...`.
+
+Если модель лежит на другом домене (CDN, S3), этот сервер должен отдавать заголовок `Access-Control-Allow-Origin`, иначе браузер не сможет прочитать файл.
+
+## События и состояние на клиенте
+
+Чтобы работать с событиями (например, кнопками вариантов), компонент должен быть клиентским:
+
+```tsx title="app/product/Variants.tsx"
+'use client';
+
+import { useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+
+export function Variants({ src }: { src: string }) {
+  const [list, setList] = useState<string[]>([]);
+  const [current, setCurrent] = useState<string>();
+  return (
+    <>
+      <Lite3D src={src} variant={current} onLoad={(e) => setList(e.detail.variants)} />
+      {list.map((v) => (
+        <button key={v} onClick={() => setCurrent(v)}>{v}</button>
+      ))}
+    </>
+  );
+}
+```

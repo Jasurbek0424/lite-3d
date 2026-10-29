@@ -1,0 +1,42 @@
+---
+title: Poster
+description: 3D yuklanguncha ko'rinadigan rasm va uni avtomatik yaratish.
+---
+
+Poster — 3D tayyor bo'lguncha element o'rnida turadigan rasm. Usiz `lazy` va `interaction` rejimlarida foydalanuvchi bo'sh maydonni ko'radi.
+
+```html
+<lite-3d src="kreslo.glb" poster="kreslo.webp"></lite-3d>
+```
+
+## Posterni modeldan yaratish
+
+Rasmni alohida chizish shart emas. `createPoster()` model yuklangandan keyin boshlang'ich kameradan toza kadr oladi: shaffof fon, soya bilan.
+
+```js
+el.addEventListener('load', () => {
+  const blob = el.createPoster({ width: 1024 }); // standart: WebP, sifat 0.85
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kreslo.webp';
+  a.click();
+});
+```
+
+Bu kodni bir marta ishga tushirib, faylni loyihaga qo'ying.
+
+| Parametr | Standart | Ma'nosi |
+|---|---|---|
+| `width` | `1024` | Kenglik px'da. Balandlik element nisbatidan olinadi |
+| `type` | `image/webp` | `image/png` ham mumkin |
+| `quality` | `0.85` | WebP/JPEG sifati |
+
+## Avtomatik poster
+
+`poster="auto"` bo'lsa, element birinchi yuklanishdagi kadrni brauzerda saqlaydi. Keyingi tashrifda 3D yuklanishidan oldin ham haqiqiy mahsulot rasmi ko'rinadi.
+
+```html
+<lite-3d src="kreslo.glb" loading="interaction" poster="auto"></lite-3d>
+```
+
+Rasm `localStorage`da model manzili bo'yicha saqlanadi (taxminan 20–40 KB). Birinchi tashrifda poster bo'lmaydi, shuning uchun muhim sahifalar uchun oldindan yaratilgan fayl yaxshiroq.

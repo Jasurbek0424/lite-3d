@@ -1,0 +1,80 @@
+---
+title: React
+description: A React component with types and events.
+---
+
+`lite3d/react` is a thin wrapper over `<lite-3d>`. It maps attribute names to React style (`autorotate-speed` → `autorotateSpeed`), turns events into props and provides TypeScript types. Works with React 18 and 19.
+
+```sh
+npm i lite3d three
+```
+
+```tsx
+import { Lite3D } from 'lite3d/react';
+
+export function ProductViewer() {
+  return (
+    <Lite3D
+      src="/chair.glb"
+      poster="/chair.webp"
+      alt="Velvet chair"
+      autorotate
+      shadow
+      onLoad={(e) => console.log('loaded in', e.detail.ms, 'ms')}
+    />
+  );
+}
+```
+
+## Hotspots
+
+Hotspots are plain `children`:
+
+```tsx
+<Lite3D src="/chair.glb">
+  <button slot="hotspot" data-position="0.0068 0.597 -0.1446">
+    Velvet fabric
+  </button>
+</Lite3D>
+```
+
+The same goes for button text: `<span slot="activate-label">Open 3D</span>`.
+
+## Calling methods
+
+`ref` gives you the element itself:
+
+```tsx
+import { useRef, useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+import type { Lite3DElement } from 'lite3d';
+
+export function ColorPicker() {
+  const ref = useRef<Lite3DElement>(null);
+  const [variants, setVariants] = useState<string[]>([]);
+  const [variant, setVariant] = useState<string>();
+
+  return (
+    <>
+      <Lite3D ref={ref} src="/watch.glb" variant={variant} onLoad={(e) => setVariants(e.detail.variants)} />
+      {variants.map((v) => (
+        <button key={v} onClick={() => setVariant(v)} aria-pressed={v === variant}>
+          {v}
+        </button>
+      ))}
+      <button onClick={() => ref.current?.resetCamera()}>Reset camera</button>
+    </>
+  );
+}
+```
+
+## Props
+
+Every attribute has a camelCase name: `autorotateSpeed`, `cameraControls`, `iosSrc`, `animationName` and so on. Boolean attributes (`autorotate`, `shadow`, `ar`, `autoplay`) take `true`/`false`.
+
+| Event prop | `e.detail` |
+|---|---|
+| `onLoad` | `{ url, ms, variants, animations, materials }` |
+| `onProgress` | `{ progress }` (0 to 1) |
+| `onError` | `{ error }` |
+| `onAnimationFinish` | `{ name }` |

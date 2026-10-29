@@ -1,0 +1,37 @@
+---
+title: Yuklash rejimlari
+description: 3D qachon yuklanishini loading atributi bilan tanlash.
+---
+
+import Viewer from '../../../../components/Viewer.astro';
+
+`loading` atributi three.js va model qachon yuklanishini belgilaydi.
+
+| Qiymat | Qachon yuklanadi | Qayerga mos |
+|---|---|---|
+| `lazy` (standart) | Element ekranga 200px yaqinlashganda | Mahsulot sahifasi, uzun sahifalar |
+| `interaction` | Foydalanuvchi "3D ko'rish" tugmasini bosganda | Katalog, bitta sahifada ko'p model |
+| `eager` | Darhol | Sahifaning birinchi ekranidagi asosiy model |
+
+## Bosilganda yuklash
+
+Katalogda o'nlab mahsulot bo'lsa, hammasini birdan yuklash mobil trafikni tez tugatadi. `interaction` rejimida foydalanuvchi faqat qiziqqan mahsulotini ochadi:
+
+<Viewer src="ToyCar.gltf.json" alt="O'yinchoq mashina" loading="interaction" poster="/posters/car.webp" shadow />
+
+```html
+<lite-3d src="mashina.glb" loading="interaction" poster="mashina.webp"></lite-3d>
+```
+
+Tugmaning ko'rinishini CSS bilan o'zgartirish va matnini tarjima qilish mumkin: [Uslub](../../guides/styling/).
+
+## Kod orqali yuklash
+
+```js
+const el = document.querySelector('lite-3d');
+await el.activate(); // loading qiymatidan qat'i nazar hozir yuklaydi
+```
+
+## Ekrandan chiqqanda
+
+Rejimdan qat'i nazar, element ko'rinmay qolganda yoki brauzer tabi yashirilganda chizish to'xtaydi va qaytganda davom etadi. Buning uchun hech narsa qilish shart emas.

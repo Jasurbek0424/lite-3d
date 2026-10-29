@@ -1,0 +1,55 @@
+---
+title: Model tayyorlash
+description: Model topish, hajmini kichraytirish va qirralarini silliqlash.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Viewer qanchalik yengil bo'lmasin, 5 MB'lik model sahifani baribir sekinlashtiradi. Sayt uchun model odatda 0.5–2 MB atrofida bo'lishi kerak.
+
+## Qayerdan olish
+
+- **Bepul modellar:** Sketchfab (yuklab olsa bo'ladiganlari), Poly Haven, Khronos glTF Sample Assets. Litsenziyasini tekshiring: "shaxsiy foydalanish uchun" belgisi bor model ochiq saytga mos kelmaydi.
+- **O'zingiz yasash:** Blender → File → Export → glTF Binary (`.glb`).
+- **Rasmdan sun'iy intellekt bilan:** Tripo, Meshy yoki ochiq kodli TRELLIS.
+- **Telefon bilan skanerlash:** Polycam kabi ilovalar.
+
+## Hajmini kichraytirish
+
+```sh
+npx @gltf-transform/cli optimize model.glb model-opt.glb \
+  --compress meshopt --texture-compress webp --texture-size 2048 --simplify false
+```
+
+- `--compress meshopt` — geometriyani siqadi. lite3d uni o'zi ochadi, qo'shimcha sozlash kerak emas.
+- `--texture-compress webp` — teksturalarni WebP'ga o'tkazadi, odatda eng katta tejash shu yerda.
+- `--texture-size 2048` — kattaroq teksturalarni kichraytiradi. Mayda yozuvi bor mahsulot (soat siferblati, yorliq) uchun 2048 qoldiring, oddiy buyumlar uchun 1024 yetarli.
+- `--simplify false` — geometriyani soddalashtirmaydi. Soddalashtirish hajmni kamaytiradi, lekin silliq sirtlarda qirralar paydo qiladi.
+
+Demodagi modellar shu usul bilan 70–86% kichraygan.
+
+## Qirralarni silliqlash
+
+Ba'zi modellar ataylab "low-poly" uslubda chizilgan: kam uchburchak, tekis yuzalar. Ular saytda burchakli ko'rinadi. Loyihadagi `scripts/subdivide.mjs` har bir uchburchakni 4 taga bo'lib, yangi nuqtalarni egri sirtga suradi. Skelet animatsiyasi, UV va yuz ifodalari saqlanadi.
+
+<Steps>
+
+1. Silliqlash (2 daraja, uchburchaklar soni 16 marta oshadi):
+
+   ```sh
+   node scripts/subdivide.mjs robot.glb robot-smooth.glb 2
+   ```
+
+2. Siqish:
+
+   ```sh
+   npx @gltf-transform/cli optimize robot-smooth.glb robot-opt.glb --compress meshopt --simplify false
+   ```
+
+</Steps>
+
+Hujjatdagi robot shu usulda tayyorlangan: 3 237 uchburchakdan 51 792 taga, siqilgandan keyin 411 KB.
+
+:::caution
+Silliqlash modelning shaklini o'zgartiradi: qirralar yumaloqlanadi. Shuning uchun u o'tkir burchakli mahsulotlarga (mebel, quti, telefon) mos emas, faqat organik shakllarga (personaj, hayvon, o'yinchoq) mos keladi.
+:::

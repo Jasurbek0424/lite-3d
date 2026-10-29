@@ -1,0 +1,60 @@
+---
+title: Стили (CSS)
+description: Размер, цвета, текст кнопок и внешний вид внутренних частей.
+---
+
+Элемент использует Shadow DOM, поэтому CSS вашей страницы не ломает его внутренности. Для настройки есть CSS-переменные, `::part()` и слоты.
+
+## CSS-переменные
+
+```css
+lite-3d {
+  --lite3d-aspect: 1 / 1;      /* соотношение сторон, по умолчанию 4 / 3 */
+  --lite3d-bg: #f5f5f5;        /* фон элемента (не фон 3D) */
+  --lite3d-radius: 12px;       /* радиус скругления */
+  --lite3d-accent: #1b2430;    /* кнопки и полоска прогресса */
+  --lite3d-accent-fg: #ffffff; /* текст кнопок */
+}
+```
+
+Для фона самой 3D-сцены используйте атрибут `background`: `<lite-3d background="#ffffff">`.
+
+## Текст кнопок
+
+Встроенные кнопки по умолчанию на английском: «View in 3D» и «View in AR». Чтобы перевести их или написать свой текст, используйте слот:
+
+```html
+<lite-3d src="chair.glb" loading="interaction" ar>
+  <span slot="activate-label">Смотреть в 3D</span>
+  <span slot="ar-label">Смотреть в AR</span>
+</lite-3d>
+```
+
+## Внутренние части
+
+| Part | Элемент |
+|---|---|
+| `poster` | Картинка постера |
+| `stage` | Контейнер 3D-canvas |
+| `progress` | Полоска загрузки |
+| `activate-button` | Кнопка «Смотреть в 3D» (`loading="interaction"`) |
+| `ar-button` | Кнопка «Смотреть в AR» |
+| `hotspots` | Слой хотспотов |
+| `fallback` | Блок, который виден без WebGL |
+
+```css
+lite-3d::part(activate-button) {
+  font-weight: 600;
+  border-radius: 6px;
+}
+```
+
+## Состояния
+
+Текущее состояние элемент пишет в атрибут `data-state`: `idle`, `loading`, `ready`, `error`, `fallback`. Его можно использовать в своих стилях:
+
+```css
+lite-3d[data-state='loading'] {
+  cursor: progress;
+}
+```

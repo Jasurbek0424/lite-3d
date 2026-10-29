@@ -1,0 +1,225 @@
+/*
+ * lite3d sayti: chuqur ko'k-qora (qorong'i) va sovuq oq (yorug') fon, bitta ko'k aksent.
+ * --l3-* — bosh sahifa va kartalar uchun; --sl-* — Starlight hujjat sahifalari uchun.
+ */
+
+:root {
+  --sl-font: 'Schibsted Grotesk', system-ui, sans-serif;
+  --sl-font-mono: 'Martian Mono', ui-monospace, monospace;
+  --sl-text-code: 0.8rem;
+  --sl-line-height: 1.65;
+  --sl-content-width: 46rem;
+
+  /* qorong'i (asosiy) */
+  --sl-color-accent-low: #0f2a55;
+  --sl-color-accent: #4b8ff8;
+  --sl-color-accent-high: #cfe0ff;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #e8eef8;
+  --sl-color-gray-2: #c2ccdc;
+  --sl-color-gray-3: #8d9ab3;
+  --sl-color-gray-4: #4a5874;
+  --sl-color-gray-5: #1e2b45;
+  --sl-color-gray-6: #121d33;
+  --sl-color-black: #0a1120;
+
+  --l3-bg: #0a1120;
+  --l3-surface: #0f1a2e;
+  --l3-surface-2: #142139;
+  --l3-border: #1e2b45;
+  --l3-fill: #18263f;
+  --l3-fill-hover: #22324f;
+  --l3-overlay: rgb(37 54 85 / 0.8);
+  --l3-text: #e8eef8;
+  --l3-muted: #8d9ab3;
+  --l3-accent: #2f7cf6;
+  --l3-accent-hover: #4b8ff8;
+  --l3-accent-soft: rgb(47 124 246 / 0.16);
+  --l3-on-accent: #ffffff;
+  --l3-stage: radial-gradient(90% 75% at 50% 35%, #1a2944 0%, #0e182b 70%);
+  --l3-glow: rgb(47 124 246 / 0.22);
+  --l3-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.25);
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #dce8fd;
+  --sl-color-accent: #1f6feb;
+  --sl-color-accent-high: #0b4fc4;
+  --sl-color-white: #0f1a2e;
+  --sl-color-gray-1: #1c2638;
+  --sl-color-gray-2: #3a4559;
+  --sl-color-gray-3: #5b6880;
+  --sl-color-gray-4: #8a96ab;
+  --sl-color-gray-5: #d6dde8;
+  --sl-color-gray-6: #e8edf4;
+  --sl-color-gray-7: #f0f3f8;
+  --sl-color-black: #f4f7fb;
+
+  --l3-bg: #f4f7fb;
+  --l3-surface: #ffffff;
+  --l3-surface-2: #f6f8fc;
+  --l3-border: #e2e8f2;
+  --l3-fill: #ebf0f7;
+  --l3-fill-hover: #dfe6f1;
+  --l3-overlay: rgb(255 255 255 / 0.88);
+  --l3-text: #0f1a2e;
+  --l3-muted: #5b6880;
+  --l3-accent: #1f6feb;
+  --l3-accent-hover: #0b5fe0;
+  --l3-accent-soft: #e6effe;
+  --l3-on-accent: #ffffff;
+  --l3-stage: radial-gradient(90% 75% at 50% 30%, #ffffff 0%, #e9eef6 75%);
+  --l3-glow: rgb(31 111 235 / 0.12);
+  --l3-shadow: 0 1px 2px rgb(15 26 46 / 0.05), 0 10px 30px rgb(15 26 46 / 0.06);
+}
+
+/* Starlight'ning yon panel, sarlavha va header chiziqlari o'chiq.
+   hairline-light qoladi: ichki menyu va qadamlar (Steps) yo'li uchun kerak. */
+:root,
+:root[data-theme='light'] {
+  --sl-color-hairline: transparent;
+  --sl-color-hairline-shade: transparent;
+}
+
+/* Header: sahifa bilan bir xil fon, chiziqsiz */
+header.header {
+  background: color-mix(in srgb, var(--l3-bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom-color: transparent;
+}
+:root site-search button[data-open-modal][data-open-modal] {
+  border-color: transparent;
+  background: var(--l3-fill);
+}
+/* Telefonda qidiruv faqat belgi: til va mavzu tugmalari bilan bir xil aylana */
+@media (max-width: 49.99rem) {
+  :root site-search button[data-open-modal][data-open-modal] {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    justify-content: center;
+  }
+}
+
+/* Sarlavhalar (faqat hujjat matnida: .not-content ichidagi kartalarga tegmaydi) */
+.sl-markdown-content :is(h2, h3):not(:where(.not-content *)) {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.sl-markdown-content h2:not(:where(.not-content *)) {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+}
+h1#_top {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.sl-markdown-content :not(pre) > code {
+  font-size: 0.82em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* Hujjatdagi jonli misollar */
+.l3-viewer {
+  margin-block: 1.5rem;
+  border-radius: 14px;
+  background: var(--l3-stage);
+  border: 1px solid transparent;
+  overflow: hidden;
+}
+.l3-viewer lite-3d {
+  --lite3d-aspect: 16 / 10;
+  --lite3d-radius: 0;
+  --lite3d-accent: var(--l3-accent);
+  --lite3d-accent-fg: var(--l3-on-accent);
+}
+.l3-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--l3-surface);
+  font-size: var(--sl-text-sm);
+}
+.l3-controls:empty { display: none; }
+
+/* Chip: bosh sahifa va hujjatlar uchun umumiy tugma */
+.l3-controls button,
+.l3-chip {
+  font: inherit;
+  font-size: var(--sl-text-sm);
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid transparent;
+  background: var(--l3-fill);
+  color: var(--l3-text);
+}
+.l3-controls button:hover,
+.l3-chip:hover {
+  background-color: var(--l3-fill-hover);
+}
+.l3-controls button[aria-pressed='true'],
+.l3-chip[aria-pressed='true'] {
+  background: var(--l3-accent);
+  border-color: var(--l3-accent);
+  color: var(--l3-on-accent);
+}
+/* "Yana harakatlar" ro'yxati: chip ko'rinishida, o'ngda o'qcha (currentColor bilan chiziladi) */
+select.l3-chip {
+  appearance: none;
+  padding-inline-end: 2rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 1rem) 52%,
+    calc(100% - 0.7rem) 52%;
+  background-size: 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+select.l3-chip.is-active {
+  background-color: var(--l3-accent);
+  color: var(--l3-on-accent);
+}
+select.l3-chip option {
+  background: var(--l3-surface);
+  color: var(--l3-text);
+}
+.l3-moves-note {
+  font-size: var(--sl-text-sm);
+  color: var(--l3-muted);
+}
+.l3-controls .l3-moves-note {
+  padding: 0.4rem 0.2rem;
+}
+
+:is(.l3-controls button, .l3-chip):focus-visible {
+  outline: 2px solid var(--l3-accent);
+  outline-offset: 2px;
+}
+
+/* Hotspot namunasi: nuqta sirtda, yorliq yonida */
+lite-3d .l3-hs {
+  transform: translate(var(--lite3d-x), var(--lite3d-y)) translate(-9px, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12px/1 var(--sl-font);
+  color: #0f1a2e;
+  background: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 3px 9px 3px 3px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgb(15 26 46 / 0.25);
+}
+lite-3d .l3-hs::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #2f7cf6;
+  box-shadow: 0 0 0 3px rgb(47 124 246 / 0.25);
+}

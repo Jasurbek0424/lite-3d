@@ -1,0 +1,47 @@
+---
+title: Variants and colors
+description: Switch between several colors or materials inside one model.
+---
+
+import Viewer from '../../../components/Viewer.astro';
+
+Stores often sell one product in several colors. There are two ways to show that: variants stored in the model, and colors set from code.
+
+## Variants in the model
+
+A model file can store several material sets with the `KHR_materials_variants` extension. In Blender this is done with "glTF Variants". Put the variant name in the `variant` attribute:
+
+<Viewer src="Watch.gltf.json" alt="Chronograph watch" shadow controls="variants" />
+
+```html
+<lite-3d src="watch.glb" variant="Midnight Gold"></lite-3d>
+```
+
+The `load` event tells you which variants the model has. That list is handy for building color buttons:
+
+```js
+el.addEventListener('load', (e) => {
+  console.log(e.detail.variants); // ['Surgical White', 'Midnight Gold', ...]
+});
+
+el.setAttribute('variant', 'Khronos Red');
+el.removeAttribute('variant'); // original materials
+```
+
+This is the right approach for textured fabric, leather or wood: each variant has its own textures.
+
+## Setting colors from code
+
+If the model has no variants, you can change a material's color directly:
+
+```js
+el.materials;                              // ['fabric', 'wood Brown', 'metal', ...]
+el.setMaterialColor('metal', '#c9a227');   // true — material found
+el.setMaterialColor('metal', null);        // back to the original color
+```
+
+This works well for flat-colored parts (metal, plastic). On a textured material the new color is multiplied by the texture, so it comes out darker than you might expect.
+
+:::caution
+`setMaterialColor` works after the model has loaded. Called earlier, it returns `false`.
+:::

@@ -1,0 +1,54 @@
+---
+title: Next.js
+description: App Router va server komponentlar bilan ishlatish.
+---
+
+`lite3d/react` faylining boshida `'use client'` direktivasi bor. Shuning uchun komponentni server komponent ichida to'g'ridan-to'g'ri ishlatish mumkin, alohida client wrapper yozish shart emas.
+
+```tsx title="app/mahsulot/[id]/page.tsx"
+import { Lite3D } from 'lite3d/react';
+
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return (
+    <main>
+      <h1>Mahsulot</h1>
+      <Lite3D src={`/models/${id}.glb`} poster={`/models/${id}.webp`} alt="Mahsulot, 3D" shadow />
+    </main>
+  );
+}
+```
+
+## Serverda nima bo'ladi
+
+Server HTML'ga `<lite-3d src="..." poster="...">` tegini yozadi. Poster sahifa bilan birga darhol ko'rinadi, 3D esa brauzerda, element ekranga yaqinlashganda yuklanadi. `lite3d`ni serverda import qilish xavfsiz: element faqat brauzerda ro'yxatdan o'tadi.
+
+## Model fayllari
+
+`.glb` fayllarni `public/models/` papkasiga qo'ying. Ular `/models/...` manzili bilan beriladi.
+
+Model boshqa domenda bo'lsa (CDN, S3), o'sha server `Access-Control-Allow-Origin` sarlavhasini qaytarishi kerak, aks holda brauzer faylni o'qiy olmaydi.
+
+## Event'lar va client holati
+
+Event'lar bilan ishlash uchun (masalan, variant tugmalari) komponent client komponent bo'lishi kerak:
+
+```tsx title="app/mahsulot/Variantlar.tsx"
+'use client';
+
+import { useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+
+export function Variantlar({ src }: { src: string }) {
+  const [list, setList] = useState<string[]>([]);
+  const [current, setCurrent] = useState<string>();
+  return (
+    <>
+      <Lite3D src={src} variant={current} onLoad={(e) => setList(e.detail.variants)} />
+      {list.map((v) => (
+        <button key={v} onClick={() => setCurrent(v)}>{v}</button>
+      ))}
+    </>
+  );
+}
+```

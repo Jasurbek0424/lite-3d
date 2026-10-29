@@ -1,0 +1,93 @@
+---
+/**
+ * Til tanlash: globus belgisi (telefonda faqat u), desktop'da yonida til nomi.
+ * Ko'rinmas <select> butun tugmani qoplaydi, shuning uchun ro'yxat tizimning o'z menyusida ochiladi.
+ */
+import { LANGS, href, langFromPath, stripLang, type Lang } from '../i18n';
+
+const NAMES: Record<Lang, string> = { en: 'English', uz: "O'zbekcha", ru: 'Русский' };
+const LABEL: Record<Lang, string> = { en: 'Language', uz: 'Til', ru: 'Язык' };
+
+const lang = langFromPath(Astro.url.pathname);
+const path = stripLang(Astro.url.pathname);
+---
+
+<label class="lang-select" title={LABEL[lang]}>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" />
+  </svg>
+  <span class="name">{NAMES[lang]}</span>
+  <select aria-label={LABEL[lang]}>
+    {
+      LANGS.map((l) => (
+        <option value={href(l, path)} selected={l === lang} lang={l}>
+          {NAMES[l]}
+        </option>
+      ))
+    }
+  </select>
+</label>
+
+<script>
+  for (const select of document.querySelectorAll<HTMLSelectElement>('.lang-select select')) {
+    select.addEventListener('change', () => (location.href = select.value + location.search));
+    // Orqaga tugmasi bilan qaytilganda (bfcache) tanlov sahifa tiliga qaytsin
+    addEventListener('pageshow', () => {
+      select.selectedIndex = select.querySelector<HTMLOptionElement>('option[selected]')?.index ?? 0;
+    });
+  }
+</script>
+
+<style>
+  .lang-select {
+    position: relative;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2.4rem;
+    min-width: 2.4rem;
+    padding-inline: 0.75rem 0.85rem;
+    border-radius: 999px;
+    background: var(--l3-fill);
+    color: var(--l3-text);
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .lang-select:hover {
+    background: var(--l3-fill-hover);
+  }
+  .lang-select:focus-within {
+    outline: 2px solid var(--l3-accent);
+    outline-offset: 2px;
+  }
+  svg {
+    flex: none;
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+  }
+  select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 16px; /* iOS kichik shriftda sahifani kattalashtirib yubormasin */
+  }
+  /* Telefonda faqat globus, mavzu tugmasi bilan bir xil aylana */
+  @media (max-width: 56rem) {
+    .lang-select {
+      justify-content: center;
+      width: 2.4rem;
+      padding: 0;
+    }
+    .name {
+      display: none;
+    }
+  }
+</style>

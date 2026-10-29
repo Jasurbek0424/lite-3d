@@ -1,0 +1,46 @@
+---
+title: Birinchi model
+description: Modelni topish, sahifaga qo'yish va ko'rinishini sozlash.
+---
+
+import Viewer from '../../../../components/Viewer.astro';
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
+1. **Model oling.** Formati `.glb` (bitta fayl) yoki `.gltf` bo'lishi kerak. Qayerdan topish va qanday kichraytirish [Model tayyorlash](../../guides/preparing-models/) sahifasida.
+
+2. **Faylni loyihaning statik papkasiga qo'ying**, masalan `public/kreslo.glb`.
+
+3. **Elementni sahifaga qo'shing:**
+
+   ```html
+   <lite-3d src="/kreslo.glb" alt="Baxmal kreslo" shadow></lite-3d>
+   ```
+
+   `alt` ekran o'quvchi dasturlar uchun: modelni ko'ra olmaydigan foydalanuvchi nima tasvirlanganini shu matndan biladi.
+
+4. **O'lchamini bering.** Element blok sifatida konteyner kengligini egallaydi, balandligi tomonlar nisbatidan olinadi (standart 4:3):
+
+   ```css
+   lite-3d {
+     --lite3d-aspect: 1 / 1;
+     max-width: 480px;
+   }
+   ```
+
+</Steps>
+
+<Viewer src="SheenChair.gltf.json" alt="Baxmal kreslo" shadow />
+
+## Ko'rinishni sozlash
+
+| Atribut | Nima qiladi |
+|---|---|
+| `autorotate` | Model sekin aylanadi. Foydalanuvchi `prefers-reduced-motion` yoqqan bo'lsa aylanmaydi. |
+| `shadow` | Model ostida yumshoq kontakt soya. |
+| `exposure="1.2"` | Umumiy yorqinlik. |
+| `background="#ffffff"` | Fon rangi. Standart holatda shaffof. |
+| `camera-controls="false"` | Foydalanuvchi kamerani aylantira olmaydi. |
+
+Barcha atributlar [Atributlar](../../reference/attributes/) sahifasida.

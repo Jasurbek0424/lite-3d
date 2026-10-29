@@ -1,0 +1,26 @@
+---
+title: View in AR
+description: Let users place the product in their own room on a phone.
+---
+
+With the `ar` attribute, a "View in AR" button appears on supported devices. Tapping it lets the user see the product in their own room through the camera.
+
+```html
+<lite-3d src="chair.glb" ios-src="chair.usdz" ar></lite-3d>
+```
+
+| Platform | What is used | What you need |
+|---|---|---|
+| Android | Google Scene Viewer | Just `src` (`.glb`) |
+| iOS | Apple Quick Look | A `.usdz` file in `ios-src` |
+
+The button shows only on devices where it works. It does not appear on desktop.
+
+## Getting a USDZ file
+
+- On macOS, Apple's **Reality Converter** turns `.glb` into `.usdz`.
+- Blender 3.5+ exports USD/USDZ directly.
+
+:::caution
+Android Scene Viewer opens the model through Google's servers, so the file must be on a public URL. AR does not work on `localhost`.
+:::

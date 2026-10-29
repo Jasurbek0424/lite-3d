@@ -1,0 +1,39 @@
+---
+title: HTML and CDN
+description: Use it on a plain HTML page without a bundler.
+---
+
+For a site without a build system (WordPress, Tilda, plain HTML), include the CDN build. It already contains three.js.
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/lite3d/dist/cdn/lite3d.cdn.js"></script>
+    <style>
+      lite-3d { max-width: 600px; --lite3d-aspect: 1 / 1; }
+    </style>
+  </head>
+  <body>
+    <lite-3d src="chair.glb" alt="Velvet chair" autorotate shadow></lite-3d>
+  </body>
+</html>
+```
+
+The script must be `type="module"`. It does not block page loading: until the element is registered, the browser shows it as a plain block.
+
+## Controlling it with JavaScript
+
+```html
+<lite-3d id="chair" src="chair.glb"></lite-3d>
+<button id="red">Red</button>
+
+<script type="module">
+  const el = document.getElementById('chair');
+  document.getElementById('red').addEventListener('click', () => {
+    el.setMaterialColor('fabric', '#b3261e');
+  });
+</script>
+```
+
+All methods are on the [API](../../reference/api/) page.

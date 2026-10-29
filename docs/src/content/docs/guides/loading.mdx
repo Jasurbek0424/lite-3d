@@ -1,0 +1,37 @@
+---
+title: Loading modes
+description: Choose when 3D loads with the loading attribute.
+---
+
+import Viewer from '../../../components/Viewer.astro';
+
+The `loading` attribute decides when three.js and the model are loaded.
+
+| Value | When it loads | Good for |
+|---|---|---|
+| `lazy` (default) | When the element is 200px away from the screen | Product pages, long pages |
+| `interaction` | When the user clicks "View in 3D" | Catalogs, many models on one page |
+| `eager` | Immediately | The main model on the first screen |
+
+## Load on click
+
+When a catalog has dozens of products, loading all of them at once burns through mobile data. In `interaction` mode the user opens only the product they care about:
+
+<Viewer src="ToyCar.gltf.json" alt="Toy car" loading="interaction" poster="/posters/car.webp" shadow />
+
+```html
+<lite-3d src="car.glb" loading="interaction" poster="car.webp"></lite-3d>
+```
+
+The button can be restyled with CSS and its text translated: see [Styling](../../guides/styling/).
+
+## Load from code
+
+```js
+const el = document.querySelector('lite-3d');
+await el.activate(); // loads now, whatever the loading value is
+```
+
+## Off screen
+
+In every mode, rendering stops when the element is no longer visible or the browser tab is hidden, and resumes when it comes back. You don't have to do anything for this.

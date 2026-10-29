@@ -1,0 +1,72 @@
+---
+title: Izohlar (hotspot)
+description: Model sirtidagi nuqtaga tugma yoki yorliq bog'lash.
+---
+
+import Viewer from '../../../../components/Viewer.astro';
+
+Hotspot — model sirtidagi nuqtaga bog'langan oddiy HTML element. Model aylanganda u nuqtaga yopishib harakatlanadi, nuqta orqa tomonda qolganda esa yashirinadi.
+
+<Viewer
+  src="SheenChair.gltf.json"
+  alt="Kreslo, material izohlari bilan"
+  shadow
+  hotspots={[
+    { label: 'Baxmal mato', position: '0.0068 0.597 -0.1446', normal: '0.026 0.281 0.959' },
+    { label: "Yog'och oyoq", position: '0.3106 0.1475 0.2075', normal: '-0.17 0.097 0.981' },
+  ]}
+/>
+
+```html
+<lite-3d src="kreslo.glb">
+  <button slot="hotspot"
+          data-position="0.0068 0.597 -0.1446"
+          data-normal="0.026 0.281 0.959">
+    Baxmal mato
+  </button>
+</lite-3d>
+```
+
+| Atribut | Majburiy | Ma'nosi |
+|---|---|---|
+| `slot="hotspot"` | ha | Elementni hotspot sifatida belgilaydi |
+| `data-position` | ha | Nuqta modelning o'z koordinatalarida: `x y z` |
+| `data-normal` | yo'q | Sirt yo'nalishi. Berilsa, nuqta orqa tomondan qaralganda yashirinadi |
+
+Model nuqtani boshqa qismi bilan to'sib qo'ysa ham hotspot yashirinadi (masalan, kreslo oyog'i suyanchiq orqasida qolsa).
+
+## Koordinatani qanday topish
+
+Raqamlarni qo'lda topish shart emas. Ishlab chiqish paytida modelni bosing va kerakli qiymatlarni oling:
+
+```js
+const el = document.querySelector('lite-3d');
+
+el.addEventListener('click', (e) => {
+  const hit = el.positionFromPoint(e.clientX, e.clientY);
+  if (hit) console.log(`data-position="${hit.position}" data-normal="${hit.normal}"`);
+});
+```
+
+Bosilgan joyda model bo'lmasa `null` qaytadi.
+
+## Ko'rinishi
+
+Joylashuv `--lite3d-x` va `--lite3d-y` CSS o'zgaruvchilari orqali beriladi, qolgan uslub to'liq sizniki. Masalan, nuqtani yorliqning chap chetiga qo'yish:
+
+```css
+lite-3d [slot='hotspot'] {
+  transform: translate(var(--lite3d-x), var(--lite3d-y)) translate(-9px, -50%);
+}
+
+/* to'silgan hotspot: standart holatda butunlay yashirinadi */
+lite-3d [slot='hotspot'][data-visible='false'] {
+  opacity: 0.25;
+}
+```
+
+Hotspot oddiy `<button>` bo'lgani uchun klaviatura bilan tanlanadi va ekran o'quvchi uni o'qiydi. Hotspot bor bo'lsa element `role="group"` oladi.
+
+:::note
+Hotspot modelning harakatsiz koordinatasiga bog'lanadi. Animatsiyali model qismlari (masalan, yurayotgan oyoq) bilan birga harakatlanmaydi.
+:::

@@ -1,0 +1,67 @@
+---
+/**
+ * So'z belgisi: "lite3d" va o'ng tomonga tarqaluvchi sxema chiziqlari —
+ * kichik kod bo'lagi katta 3D'ga ulanadi degan g'oya.
+ */
+import { href, langFromPath, t } from '../i18n';
+
+const lang = langFromPath(Astro.url.pathname);
+---
+
+<a href={href(lang, '/')} class="logo" aria-label={t(lang)['logo.label']}>
+  <span class="word">lite<b>3d</b></span>
+  <svg class="traces" viewBox="0 0 60 28" fill="none" aria-hidden="true">
+    <path d="M0 8h14l6 -5h18" />
+    <path d="M0 14h26l5 5h22" />
+    <path d="M0 20h10l6 5h14" />
+    <path d="M14 8l4 0" class="hi" />
+    <circle cx="38" cy="3" r="2" />
+    <circle cx="53" cy="19" r="2" class="hi-dot" />
+    <circle cx="30" cy="25" r="2" />
+  </svg>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    color: var(--l3-text);
+  }
+  .word {
+    font: 700 1.45rem/1 var(--sl-font);
+    letter-spacing: -0.035em;
+  }
+  .word b {
+    font-weight: 700;
+    color: var(--l3-accent);
+  }
+  .traces {
+    width: 46px;
+    height: 22px;
+    stroke: var(--l3-muted);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.7;
+  }
+  /* Telefonda header'da joy tor: hujjat sahifalarida Starlight'ning menyu tugmasi ham turadi */
+  @media (max-width: 30rem) {
+    .traces {
+      display: none;
+    }
+  }
+  .traces circle {
+    fill: var(--l3-bg);
+  }
+  .traces .hi-dot {
+    stroke: var(--l3-accent);
+    fill: var(--l3-accent);
+  }
+  .logo:focus-visible {
+    outline: 2px solid var(--l3-accent);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+</style>

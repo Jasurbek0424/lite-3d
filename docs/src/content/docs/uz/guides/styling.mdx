@@ -1,0 +1,60 @@
+---
+title: Uslub (CSS)
+description: O'lcham, rang, tugma matni va ichki qismlarning ko'rinishini o'zgartirish.
+---
+
+Element Shadow DOM ishlatadi, shuning uchun sahifangizdagi CSS uning ichini buzmaydi. Sozlash uchun CSS o'zgaruvchilari, `::part()` va slotlar bor.
+
+## CSS o'zgaruvchilari
+
+```css
+lite-3d {
+  --lite3d-aspect: 1 / 1;      /* tomonlar nisbati, standart 4 / 3 */
+  --lite3d-bg: #f5f5f5;        /* element foni (3D foni emas) */
+  --lite3d-radius: 12px;       /* burchak radiusi */
+  --lite3d-accent: #1b2430;    /* tugmalar va progress chizig'i */
+  --lite3d-accent-fg: #ffffff; /* tugma matni */
+}
+```
+
+3D sahnaning o'z foni uchun `background` atributini ishlating: `<lite-3d background="#ffffff">`.
+
+## Tugma matnlari
+
+Ichki tugmalar standart holatda inglizcha: "View in 3D" va "View in AR". O'zbekchaga o'girish yoki o'z matningizni yozish uchun slot ishlating:
+
+```html
+<lite-3d src="kreslo.glb" loading="interaction" ar>
+  <span slot="activate-label">3D ko'rish</span>
+  <span slot="ar-label">AR'da ko'rish</span>
+</lite-3d>
+```
+
+## Ichki qismlar
+
+| Part | Element |
+|---|---|
+| `poster` | Poster rasm |
+| `stage` | 3D canvas konteyneri |
+| `progress` | Yuklanish chizig'i |
+| `activate-button` | "3D ko'rish" tugmasi (`loading="interaction"`) |
+| `ar-button` | "AR'da ko'rish" tugmasi |
+| `hotspots` | Hotspot'lar qatlami |
+| `fallback` | WebGL bo'lmaganda ko'rinadigan blok |
+
+```css
+lite-3d::part(activate-button) {
+  font-weight: 600;
+  border-radius: 6px;
+}
+```
+
+## Holatlar
+
+Element joriy holatini `data-state` atributida ko'rsatadi: `idle`, `loading`, `ready`, `error`, `fallback`. Undan o'z uslubingiz uchun foydalanishingiz mumkin:
+
+```css
+lite-3d[data-state='loading'] {
+  cursor: progress;
+}
+```

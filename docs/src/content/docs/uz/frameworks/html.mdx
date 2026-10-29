@@ -1,0 +1,39 @@
+---
+title: HTML va CDN
+description: Bundlersiz, oddiy HTML sahifada ishlatish.
+---
+
+Build tizimi bo'lmagan sayt uchun (WordPress, Tilda, oddiy HTML) CDN build'ni ulang. Uning ichida three.js ham bor.
+
+```html
+<!doctype html>
+<html lang="uz">
+  <head>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/lite3d/dist/cdn/lite3d.cdn.js"></script>
+    <style>
+      lite-3d { max-width: 600px; --lite3d-aspect: 1 / 1; }
+    </style>
+  </head>
+  <body>
+    <lite-3d src="kreslo.glb" alt="Baxmal kreslo" autorotate shadow></lite-3d>
+  </body>
+</html>
+```
+
+Skript `type="module"` bo'lishi shart. U sahifa yuklanishini to'xtatmaydi: element ro'yxatdan o'tguncha brauzer uni oddiy blok sifatida ko'rsatadi.
+
+## JavaScript bilan boshqarish
+
+```html
+<lite-3d id="kreslo" src="kreslo.glb"></lite-3d>
+<button id="qizil">Qizil</button>
+
+<script type="module">
+  const el = document.getElementById('kreslo');
+  document.getElementById('qizil').addEventListener('click', () => {
+    el.setMaterialColor('fabric', '#b3261e');
+  });
+</script>
+```
+
+Barcha metodlar [API](../../reference/api/) sahifasida.

@@ -1,0 +1,39 @@
+---
+title: HTML и CDN
+description: Использование на обычной HTML-странице без сборщика.
+---
+
+Для сайта без системы сборки (WordPress, Tilda, обычный HTML) подключите CDN-сборку. В неё уже входит three.js.
+
+```html
+<!doctype html>
+<html lang="ru">
+  <head>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/lite3d/dist/cdn/lite3d.cdn.js"></script>
+    <style>
+      lite-3d { max-width: 600px; --lite3d-aspect: 1 / 1; }
+    </style>
+  </head>
+  <body>
+    <lite-3d src="chair.glb" alt="Бархатное кресло" autorotate shadow></lite-3d>
+  </body>
+</html>
+```
+
+Скрипт обязательно должен быть `type="module"`. Он не блокирует загрузку страницы: пока элемент не зарегистрирован, браузер показывает его как обычный блок.
+
+## Управление из JavaScript
+
+```html
+<lite-3d id="chair" src="chair.glb"></lite-3d>
+<button id="red">Красный</button>
+
+<script type="module">
+  const el = document.getElementById('chair');
+  document.getElementById('red').addEventListener('click', () => {
+    el.setMaterialColor('fabric', '#b3261e');
+  });
+</script>
+```
+
+Все методы — на странице [API](../../reference/api/).

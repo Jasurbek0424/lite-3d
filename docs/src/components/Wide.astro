@@ -1,0 +1,18 @@
+---
+/** Starlight splash konteyneridan kengroq maydon: bosh sahifa va galereya uchun. */
+---
+
+<div class="wide not-content"><slot /></div>
+
+<style>
+  .wide {
+    --w: min(84rem, 100vw - 2rem);
+    width: var(--w);
+    margin-inline: calc((100% - var(--w)) / 2);
+    display: grid;
+    /* minmax(0, ...) shart: aks holda uzun kod qatori ustunni ekrandan kengaytirib yuboradi */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+    padding-block: 0.5rem 1rem;
+  }
+</style>

@@ -1,0 +1,669 @@
+---
+/**
+ * Bosh sahifa: chapda viewer kartasi (modellar orasida o'tish), o'ngda boshqaruv paneli.
+ * Panel jonli: tanlangan model va atributlar kod namunasida ham darhol ko'rinadi.
+ */
+import { getModels } from '../data/models';
+import { langFromPath, t } from '../i18n';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const lang = langFromPath(Astro.url.pathname);
+const tr = t(lang);
+const models = getModels(lang);
+const first = models[0];
+const altFor = (name: string) => tr['viewer.alt'].replace('{name}', name);
+const backgrounds = [
+  { value: '', label: tr['bg.transparent'] },
+  { value: '#ffffff', label: tr['bg.white'] },
+  { value: '#e9e2d6', label: tr['bg.sand'] },
+  { value: '#1b2433', label: tr['bg.graphite'] },
+];
+const data = models.map((m) => ({ ...m, url: `${base}/models/${m.file}`, alt: altFor(m.name) }));
+---
+
+<section class="showcase not-content" data-models={JSON.stringify(data)}>
+  <div class="viewer-card">
+    <div class="card-top">
+      <span class="crumb">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7z M12 12l9-5M12 12 3 7M12 12v10" /></svg>
+        {tr['show.crumb']}
+        <span class="sep" aria-hidden="true">/</span>
+        <span class="category">{first.category}</span>
+      </span>
+      <div class="card-actions">
+        <button type="button" class="icon-btn" data-action="fullscreen" aria-label={tr['show.fullscreen']} title={tr['show.fullscreen']}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+        </button>
+        <button type="button" class="icon-btn" data-action="reset" aria-label={tr['show.reset']} title={tr['show.reset']}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <lite-3d
+      id="l3-show"
+      src={`${base}/models/${first.file}`}
+      alt={altFor(first.name)}
+      loading="eager"
+      autorotate
+      autorotate-speed="0.5"
+      shadow>
+      <span slot="activate-label">{tr['viewer.activate']}</span>
+      <span slot="ar-label">{tr['viewer.ar']}</span>
+    </lite-3d>
+
+    <button type="button" class="nav-btn prev" data-step="-1" aria-label={tr['show.prev']}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+    </button>
+    <button type="button" class="nav-btn next" data-step="1" aria-label={tr['show.next']}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+    </button>
+
+    <div class="thumbs" role="group" aria-label={tr['show.models']}>
+      {
+        models.map((m, i) => (
+          <button type="button" class="thumb" data-index={i} aria-pressed={i === 0 ? 'true' : 'false'} title={m.name}>
+            <img src={`${base}/posters/${m.id}.webp`} alt={m.name} width="80" height="60" loading="lazy" decoding="async" />
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="tag">{tr['show.tag']}</span>
+    <h1 id="_top" data-page-title>{tr['show.title']}</h1>
+    <p class="lede">{tr['show.lede']}</p>
+
+    <div class="code">
+      <pre><code id="l3-code"></code></pre>
+      <button type="button" class="icon-btn copy" data-action="copy" aria-label={tr['show.copy']} title={tr['show.copy']}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" /></svg>
+      </button>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn primary" data-action="copy">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" /></svg>
+        <span class="copy-label">{tr['show.copy']}</span>
+      </button>
+      <button type="button" class="btn" data-action="reset">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" /></svg>
+        {tr['show.reset']}
+      </button>
+    </div>
+
+    <dl class="controls">
+      <dt>{tr['show.model']}</dt>
+      <dd class="chips" role="group" aria-label={tr['show.model']}>
+        {
+          models.map((m, i) => (
+            <button type="button" class="l3-chip" data-index={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+              {m.short}
+            </button>
+          ))
+        }
+      </dd>
+
+      <dt>{tr['show.attributes']}</dt>
+      <dd class="chips" role="group" aria-label={tr['show.attributes']}>
+        <button type="button" class="l3-chip" data-toggle="autorotate" aria-pressed="true">autorotate</button>
+        <button type="button" class="l3-chip" data-toggle="shadow" aria-pressed="true">shadow</button>
+      </dd>
+
+      <dt>{tr['moves.label']}</dt>
+      <dd class="chips" id="l3-moves" role="group" aria-label={tr['moves.label']}></dd>
+
+      <dt><label for="l3-exposure">{tr['show.exposure']}</label></dt>
+      <dd class="range">
+        <input id="l3-exposure" type="range" min="0.4" max="2" step="0.05" value="1" />
+        <output for="l3-exposure" id="l3-exposure-v">1.00</output>
+      </dd>
+
+      <dt>{tr['show.background']}</dt>
+      <dd class="swatches" role="group" aria-label={tr['show.bgLabel']}>
+        {
+          backgrounds.map((b, i) => (
+            <button
+              type="button"
+              class="swatch"
+              data-bg={b.value}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              aria-label={b.label}
+              title={b.label}
+              style={b.value ? `background:${b.value}` : undefined}
+            />
+          ))
+        }
+      </dd>
+
+      <dt>{tr['show.events']}</dt>
+      <dd>
+        <ol class="log" id="l3-log" aria-live="polite"></ol>
+      </dd>
+    </dl>
+  </div>
+</section>
+
+<script>
+  import 'lite3d';
+  import { clearMoves, renderMoves } from '../scripts/moves';
+  import { pageLang, t } from '../i18n';
+
+  type Model = { id: string; name: string; alt: string; category: string; url: string; sample: string; attrs?: Record<string, string> };
+
+  const tr = t(pageLang());
+
+  const root = document.querySelector<HTMLElement>('.showcase')!;
+  const models: Model[] = JSON.parse(root.dataset.models!);
+  const el = document.getElementById('l3-show')!;
+  const code = document.getElementById('l3-code')!;
+  const log = document.getElementById('l3-log')!;
+  const category = root.querySelector('.category')!;
+  const moves = document.getElementById('l3-moves')!;
+  let current = 0;
+
+  // ---------- kod namunasi: elementning joriy holatidan yasaladi ----------
+  const SHOWN = ['autorotate', 'shadow', 'exposure', 'background', 'autoplay', 'animation-name'];
+  function snippet(): string {
+    const parts = [`src="${models[current].sample}"`];
+    for (const name of SHOWN) {
+      if (!el.hasAttribute(name)) continue;
+      const v = el.getAttribute(name);
+      if (name === 'exposure' && v === '1') continue;
+      // Astro custom element'da boolean atributni autorotate="true" qilib chiqaradi
+      parts.push(v && v !== 'true' ? `${name}="${v}"` : name);
+    }
+    // ikkinchi qatordan boshlab chekinish bilan, uzun qator karta tashqarisiga chiqmasin
+    const lines = [`<lite-3d ${parts[0]}`];
+    for (let i = 1; i < parts.length; i += 2) lines.push('  ' + parts.slice(i, i + 2).join(' '));
+    return lines.join('\n') + '></lite-3d>';
+  }
+  function renderCode() {
+    const text = snippet();
+    code.textContent = text;
+    // avval qiymatlar, keyin teg: aks holda regex qo'shilgan class="..." ni ham ushlab oladi
+    code.innerHTML = code.innerHTML
+      .replace(/="([^"]*)"/g, '=<span class="s">"$1"</span>')
+      .replace(/(&lt;\/?lite-3d)/g, '<span class="t">$1</span>');
+  }
+
+  // ---------- hodisalar jurnali ----------
+  function addLog(name: string, text: string) {
+    const li = document.createElement('li');
+    const time = new Date().toLocaleTimeString('en-GB');
+    li.innerHTML = `<time>${time}</time> <b>${name}</b> `;
+    li.append(text);
+    log.prepend(li);
+    while (log.children.length > 3) log.lastElementChild!.remove();
+  }
+  let lastPct = -1;
+  el.addEventListener('progress', (e) => {
+    const p = Math.round((e as CustomEvent).detail.progress * 100);
+    if (p === 100 || p - lastPct >= 50) {
+      lastPct = p;
+      addLog('progress', p + '%');
+    }
+  });
+  el.addEventListener('load', (e) => {
+    const d = (e as CustomEvent).detail;
+    addLog('load', `${models[current].sample}, ${d.ms} ms`);
+
+    // Harakatlar modelning o'zidan olinadi: qo'lda ro'yxat yozilmaydi
+    const playing = el.hasAttribute('autoplay') ? (el.getAttribute('animation-name') ?? d.animations[0] ?? null) : null;
+    renderMoves(moves, d.animations, playing, (name) => {
+      el.setAttribute('autoplay', '');
+      el.setAttribute('animation-name', name);
+      el.play(name);
+      renderCode();
+    });
+  });
+  el.addEventListener('error', () => {
+    addLog('error', tr['show.loadError']);
+    clearMoves(moves, '—');
+  });
+
+  // ---------- model almashtirish ----------
+  function select(i: number) {
+    current = (i + models.length) % models.length;
+    const m = models[current];
+    lastPct = -1;
+    for (const a of ['autoplay', 'animation-name']) el.removeAttribute(a);
+    for (const [k, v] of Object.entries(m.attrs ?? {})) el.setAttribute(k, v);
+    el.setAttribute('alt', m.alt);
+    el.setAttribute('src', m.url);
+    category.textContent = m.category;
+    clearMoves(moves);
+    root.querySelectorAll<HTMLElement>('[data-index]').forEach((b) =>
+      b.setAttribute('aria-pressed', String(Number(b.dataset.index) === current)),
+    );
+    renderCode();
+  }
+  root.querySelectorAll<HTMLElement>('[data-index]').forEach((b) =>
+    b.addEventListener('click', () => select(Number(b.dataset.index))),
+  );
+  root.querySelectorAll<HTMLElement>('[data-step]').forEach((b) =>
+    b.addEventListener('click', () => select(current + Number(b.dataset.step))),
+  );
+  // Modellar sahifasidan ?model=watch bilan kelinsa
+  const wanted = new URLSearchParams(location.search).get('model');
+  const wantedIndex = models.findIndex((m) => m.id === wanted);
+  if (wantedIndex > 0) select(wantedIndex);
+
+  // ---------- atributlar ----------
+  root.querySelectorAll<HTMLElement>('[data-toggle]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', String(on));
+      el.toggleAttribute(b.dataset.toggle!, on);
+      renderCode();
+    }),
+  );
+  const exposure = document.getElementById('l3-exposure') as HTMLInputElement;
+  exposure.addEventListener('input', () => {
+    el.setAttribute('exposure', exposure.value);
+    document.getElementById('l3-exposure-v')!.textContent = Number(exposure.value).toFixed(2);
+    renderCode();
+  });
+  root.querySelectorAll<HTMLElement>('[data-bg]').forEach((b) =>
+    b.addEventListener('click', () => {
+      root.querySelectorAll('[data-bg]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      if (b.dataset.bg) el.setAttribute('background', b.dataset.bg);
+      else el.removeAttribute('background');
+      renderCode();
+    }),
+  );
+
+  // ---------- amallar ----------
+  const card = root.querySelector<HTMLElement>('.viewer-card')!;
+  root.querySelectorAll<HTMLElement>('[data-action]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      const action = b.dataset.action;
+      if (action === 'reset') el.resetCamera();
+      if (action === 'fullscreen') {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else card.requestFullscreen?.();
+      }
+      if (action === 'copy') {
+        const label = root.querySelector('.copy-label')!;
+        try {
+          await navigator.clipboard.writeText(snippet());
+          label.textContent = tr['show.copied'];
+        } catch {
+          label.textContent = tr['show.copyFallback'];
+          getSelection()?.selectAllChildren(code);
+        }
+        setTimeout(() => (label.textContent = tr['show.copy']), 1600);
+      }
+    }),
+  );
+
+  clearMoves(moves);
+  renderCode();
+</script>
+
+<style>
+  .showcase {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  @media (min-width: 64rem) {
+    .showcase {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      gap: 2rem;
+      align-items: start;
+    }
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ---------- viewer kartasi ---------- */
+  .viewer-card {
+    position: relative;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: var(--l3-stage);
+    box-shadow: var(--l3-shadow);
+    overflow: hidden;
+  }
+  .viewer-card lite-3d {
+    --lite3d-aspect: 4 / 3;
+    --lite3d-radius: 0;
+    --lite3d-accent: var(--l3-accent);
+    --lite3d-accent-fg: var(--l3-on-accent);
+  }
+  .viewer-card:fullscreen {
+    border-radius: 0;
+  }
+  .viewer-card:fullscreen lite-3d {
+    aspect-ratio: auto;
+    height: 100vh;
+  }
+
+  .card-top {
+    position: absolute;
+    inset: 1rem 1rem auto;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+  .card-top > * {
+    pointer-events: auto;
+  }
+  .crumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.85rem 0.4rem 0.65rem;
+    border-radius: 999px;
+    background: var(--l3-overlay);
+    border: 1px solid transparent;
+    backdrop-filter: blur(8px);
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    color: var(--l3-text);
+  }
+  .crumb svg {
+    width: 15px;
+    height: 15px;
+  }
+  .crumb .sep,
+  .crumb .category {
+    color: var(--l3-muted);
+    font-weight: 400;
+  }
+  .card-actions {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: var(--l3-overlay);
+    backdrop-filter: blur(8px);
+    color: var(--l3-text);
+    cursor: pointer;
+  }
+  .icon-btn:hover {
+    background: var(--l3-fill-hover);
+  }
+
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    margin-top: -1.3rem;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background: var(--l3-overlay);
+    backdrop-filter: blur(8px);
+    color: var(--l3-text);
+    box-shadow: var(--l3-shadow);
+    cursor: pointer;
+  }
+  .nav-btn:hover {
+    border-color: var(--l3-accent);
+  }
+  .prev {
+    left: 1rem;
+  }
+  .next {
+    right: 1rem;
+  }
+
+  .thumbs {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 2;
+    display: flex;
+    gap: 0.5rem;
+    max-width: calc(100% - 2rem);
+    overflow-x: auto;
+  }
+  .thumb {
+    flex: none;
+    padding: 0;
+    width: 4.5rem;
+    height: 3.4rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: var(--l3-overlay);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .thumb[aria-pressed='true'] {
+    border: 2px solid var(--l3-accent);
+    box-shadow: 0 0 0 3px var(--l3-accent-soft);
+  }
+  :is(.icon-btn, .nav-btn, .thumb, .btn, .swatch):focus-visible {
+    outline: 2px solid var(--l3-accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- panel ---------- */
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
+    align-content: start;
+  }
+  .tag {
+    justify-self: start;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    background: var(--l3-accent-soft);
+    color: var(--l3-accent-hover);
+    font-size: var(--sl-text-xs);
+    font-weight: 500;
+  }
+  :global([data-theme='light']) .tag {
+    color: var(--l3-accent);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 1.3rem + 2.2vw, 2.9rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    color: var(--l3-text);
+    text-wrap: balance;
+  }
+  .lede {
+    margin: 0;
+    max-width: 34rem;
+    color: var(--l3-muted);
+    line-height: 1.6;
+  }
+
+  .code {
+    position: relative;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: var(--l3-surface);
+  }
+  .code pre {
+    margin: 0;
+    padding: 1rem 3.25rem 1rem 1.1rem;
+    overflow-x: auto;
+    font: 400 0.78rem/1.75 var(--sl-font-mono);
+    color: var(--l3-text);
+  }
+  .code :global(.t) {
+    color: #f472b6;
+  }
+  .code :global(.s) {
+    color: #34d399;
+  }
+  :global([data-theme='light']) .code :global(.t) {
+    color: #c026d3;
+  }
+  :global([data-theme='light']) .code :global(.s) {
+    color: #059669;
+  }
+  .code .copy {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 8px;
+  }
+  .code .copy svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.15rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: var(--l3-fill);
+    color: var(--l3-text);
+    font: 500 var(--sl-text-sm) / 1 var(--sl-font);
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--l3-fill-hover);
+  }
+  .btn.primary {
+    background: var(--l3-accent);
+    border-color: var(--l3-accent);
+    color: var(--l3-on-accent);
+  }
+  .btn.primary:hover {
+    background: var(--l3-accent-hover);
+  }
+  .btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: 0.85rem 1rem;
+    align-items: center;
+    margin: 0.4rem 0 0;
+    padding-top: 1.1rem;
+  }
+  dt {
+    font-size: var(--sl-text-sm);
+    color: var(--l3-muted);
+  }
+  dd {
+    margin: 0;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .range {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .range input {
+    flex: 1;
+    accent-color: var(--l3-accent);
+  }
+  .range output {
+    min-width: 2.6rem;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--sl-text-sm);
+    color: var(--l3-text);
+  }
+  .swatches {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .swatch {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgb(128 140 160 / 0.35);
+    cursor: pointer;
+    background: conic-gradient(var(--l3-border) 25%, var(--l3-surface) 0 50%, var(--l3-border) 0 75%, var(--l3-surface) 0) 0 0 / 8px 8px;
+  }
+  .swatch[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--l3-bg), 0 0 0 4px var(--l3-accent);
+  }
+
+  .log {
+    margin: 0;
+    padding: 0.7rem 0.9rem;
+    min-height: 4.4rem;
+    list-style: none;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: var(--l3-surface);
+    font: 400 0.72rem/1.75 var(--sl-font-mono);
+    color: var(--l3-muted);
+    overflow-x: auto;
+  }
+  .log :global(li) {
+    white-space: nowrap;
+  }
+  .log :global(b) {
+    font-weight: 500;
+    color: var(--l3-text);
+  }
+  .log :global(time) {
+    color: var(--l3-muted);
+  }
+
+  @media (max-width: 40rem) {
+    .controls {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.4rem;
+    }
+    dd {
+      margin-bottom: 0.6rem;
+    }
+    .thumb {
+      width: 3.6rem;
+      height: 2.8rem;
+    }
+    .nav-btn {
+      width: 2.2rem;
+      height: 2.2rem;
+      margin-top: -1.1rem;
+    }
+  }
+</style>

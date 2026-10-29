@@ -1,0 +1,173 @@
+---
+title: Animations
+description: Play, pause and switch the animations stored in a model.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import Viewer from '../../../components/Viewer.astro';
+
+A model file can store several animations: a door opening, a mechanism turning, a character walking. `autoplay` starts the first one automatically, and `animation-name` picks exactly which one.
+
+<Viewer
+  src="Robot.gltf.json"
+  alt="Robot with walking and dancing animations"
+  shadow
+  autoplay
+  animation-name="Walking"
+  controls="animations"
+/>
+
+```html
+<lite-3d src="robot.glb" autoplay animation-name="Walking"></lite-3d>
+```
+
+## Controls
+
+```js
+el.animations;      // ['Dance', 'Death', 'Idle', 'Jump', ...] — in file order
+el.play('Dance');   // switch to another animation
+el.pause();
+el.play();          // resume where it stopped
+el.paused;          // true | false
+```
+
+| Attribute | Default | Meaning |
+|---|---|---|
+| `autoplay` | off | Start right after loading |
+| `animation-name` | the first one | Which animation |
+| `animation-speed` | `1` | Speed: `0.5` slower, `2` faster |
+| `animation-loop` | on | With `"false"` it plays once and stops on the last frame |
+
+## Listing moves automatically
+
+You don't have to write animation names by hand: once the model loads, the `detail.animations` field of the `load` event holds every animation in the file. The example above and the demo on the home page follow this rule:
+
+| In the model | Shown as |
+|---|---|
+| no animations | "No moves" |
+| 1–4 | all as buttons |
+| 5 or more | the first 4 as buttons, the rest in a "More moves" dropdown |
+
+The list comes in file order. To change which moves become buttons, put them first in Blender or sort the `names` array yourself.
+
+<Tabs syncKey="framework">
+<TabItem label="HTML">
+
+```html
+<lite-3d id="robot" src="robot.glb" autoplay></lite-3d>
+<div id="moves"></div>
+
+<script type="module">
+  const el = document.getElementById('robot');
+  const box = document.getElementById('moves');
+  const MAX = 4;
+
+  el.addEventListener('load', (e) => {
+    const names = e.detail.animations;
+    if (!names.length) {
+      box.textContent = 'No moves';
+      return;
+    }
+
+    const play = (name) => {
+      el.setAttribute('animation-name', name);
+      el.play(name);
+    };
+
+    const buttons = names.slice(0, MAX).map((name) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.onclick = () => play(name);
+      return b;
+    });
+    box.replaceChildren(...buttons);
+
+    const rest = names.slice(MAX);
+    if (rest.length) {
+      const more = document.createElement('select');
+      more.setAttribute('aria-label', 'More moves');
+      more.append(new Option('More moves', ''), ...rest.map((n) => new Option(n, n)));
+      more.onchange = () => more.value && play(more.value);
+      box.append(more);
+    }
+  });
+</script>
+```
+
+</TabItem>
+<TabItem label="React">
+
+```tsx
+'use client';
+import { useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+
+const MAX = 4;
+
+export function Robot() {
+  const [names, setNames] = useState<string[] | null>(null);
+  const [current, setCurrent] = useState<string>();
+
+  const buttons = names?.slice(0, MAX) ?? [];
+  const rest = names?.slice(MAX) ?? [];
+
+  return (
+    <>
+      <Lite3D src="/robot.glb" autoplay animationName={current} onLoad={(e) => setNames(e.detail.animations)} />
+
+      {names?.length === 0 && <p>No moves</p>}
+      {buttons.map((n) => (
+        <button key={n} aria-pressed={n === current} onClick={() => setCurrent(n)}>
+          {n}
+        </button>
+      ))}
+      {rest.length > 0 && (
+        <select
+          aria-label="More moves"
+          value={current && rest.includes(current) ? current : ''}
+          onChange={(e) => e.target.value && setCurrent(e.target.value)}
+        >
+          <option value="">More moves</option>
+          {rest.map((n) => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+      )}
+    </>
+  );
+}
+```
+
+When `animationName` changes, lite3d switches to the new animation by itself; there is no need to call `play()`.
+
+</TabItem>
+</Tabs>
+
+## Adding new moves
+
+Animations live inside the model file; lite3d only plays them. So a new move is added in a 3D tool, not in code:
+
+- **Humanoid character:** upload the model to [Mixamo](https://www.mixamo.com/) and it rigs the skeleton for you. Download the moves you need (walk, run, dance) and combine them into one `.glb` in Blender. Each move is exported as a separate named clip.
+- **Animal or mechanism:** animate it by hand in Blender with a skeleton or keyframes. Simple motions like a door opening or a hand turning take just a few keyframes.
+
+Once the file is ready, new moves show up in the list above automatically. For compressing the file, see [Preparing models](../../guides/preparing-models/).
+
+## One-off motion
+
+A door or a box lid should open once and stay open:
+
+```html
+<lite-3d src="cabinet.glb" autoplay animation-name="Open" animation-loop="false"></lite-3d>
+```
+
+The `animation-finish` event tells you when it is done:
+
+```js
+el.addEventListener('animation-finish', (e) => {
+  console.log(e.detail.name, 'finished');
+});
+```
+
+:::note
+If the user has reduced motion turned on in their system (`prefers-reduced-motion`), `autoplay` does nothing. `play()` still works, because the user triggers it themselves.
+:::

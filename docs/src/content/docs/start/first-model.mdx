@@ -1,0 +1,46 @@
+---
+title: First model
+description: Find a model, put it on the page and tune how it looks.
+---
+
+import Viewer from '../../../components/Viewer.astro';
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
+1. **Get a model.** It should be `.glb` (a single file) or `.gltf`. Where to find one and how to shrink it is on the [Preparing models](../../guides/preparing-models/) page.
+
+2. **Put the file in your project's static folder**, for example `public/chair.glb`.
+
+3. **Add the element to the page:**
+
+   ```html
+   <lite-3d src="/chair.glb" alt="Velvet chair" shadow></lite-3d>
+   ```
+
+   `alt` is for screen readers: a user who cannot see the model learns what it shows from this text.
+
+4. **Give it a size.** The element is a block that takes the container width; its height comes from the aspect ratio (4:3 by default):
+
+   ```css
+   lite-3d {
+     --lite3d-aspect: 1 / 1;
+     max-width: 480px;
+   }
+   ```
+
+</Steps>
+
+<Viewer src="SheenChair.gltf.json" alt="Velvet chair" shadow />
+
+## Tuning the look
+
+| Attribute | What it does |
+|---|---|
+| `autorotate` | The model slowly rotates. It stays still if the user has `prefers-reduced-motion` on. |
+| `shadow` | A soft contact shadow under the model. |
+| `exposure="1.2"` | Overall brightness. |
+| `background="#ffffff"` | Background color. Transparent by default. |
+| `camera-controls="false"` | The user cannot rotate the camera. |
+
+All attributes are on the [Attributes](../../reference/attributes/) page.

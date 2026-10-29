@@ -1,0 +1,42 @@
+---
+title: Poster
+description: The image shown before 3D loads, and how to generate it automatically.
+---
+
+A poster is the image that stands in for the element until 3D is ready. Without one, users see an empty area in `lazy` and `interaction` modes.
+
+```html
+<lite-3d src="chair.glb" poster="chair.webp"></lite-3d>
+```
+
+## Generating a poster from the model
+
+You don't need to draw the image separately. After the model loads, `createPoster()` takes a clean frame from the initial camera: transparent background, with the shadow.
+
+```js
+el.addEventListener('load', () => {
+  const blob = el.createPoster({ width: 1024 }); // default: WebP, quality 0.85
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'chair.webp';
+  a.click();
+});
+```
+
+Run this code once and put the file into your project.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `width` | `1024` | Width in px. Height follows the element's aspect ratio |
+| `type` | `image/webp` | `image/png` also works |
+| `quality` | `0.85` | WebP/JPEG quality |
+
+## Automatic poster
+
+With `poster="auto"`, the element saves the frame from the first load in the browser. On the next visit the real product image shows even before 3D loads.
+
+```html
+<lite-3d src="chair.glb" loading="interaction" poster="auto"></lite-3d>
+```
+
+The image is stored in `localStorage` under the model URL (about 20–40 KB). There is no poster on the first visit, so for important pages a pre-generated file is better.

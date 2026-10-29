@@ -1,0 +1,72 @@
+---
+title: Hotspots
+description: Attach a button or label to a point on the model surface.
+---
+
+import Viewer from '../../../components/Viewer.astro';
+
+A hotspot is a regular HTML element tied to a point on the model surface. It follows that point as the model rotates and hides when the point is on the far side.
+
+<Viewer
+  src="SheenChair.gltf.json"
+  alt="Chair with material notes"
+  shadow
+  hotspots={[
+    { label: 'Velvet fabric', position: '0.0068 0.597 -0.1446', normal: '0.026 0.281 0.959' },
+    { label: 'Wooden leg', position: '0.3106 0.1475 0.2075', normal: '-0.17 0.097 0.981' },
+  ]}
+/>
+
+```html
+<lite-3d src="chair.glb">
+  <button slot="hotspot"
+          data-position="0.0068 0.597 -0.1446"
+          data-normal="0.026 0.281 0.959">
+    Velvet fabric
+  </button>
+</lite-3d>
+```
+
+| Attribute | Required | Meaning |
+|---|---|---|
+| `slot="hotspot"` | yes | Marks the element as a hotspot |
+| `data-position` | yes | The point in the model's own coordinates: `x y z` |
+| `data-normal` | no | Surface direction. When set, the point hides when seen from behind |
+
+A hotspot also hides when another part of the model blocks it (for example, a chair leg behind the backrest).
+
+## Finding coordinates
+
+You don't have to work out the numbers by hand. During development, click the model and grab the values:
+
+```js
+const el = document.querySelector('lite-3d');
+
+el.addEventListener('click', (e) => {
+  const hit = el.positionFromPoint(e.clientX, e.clientY);
+  if (hit) console.log(`data-position="${hit.position}" data-normal="${hit.normal}"`);
+});
+```
+
+It returns `null` if there is no model under the click.
+
+## Appearance
+
+Position is passed through the `--lite3d-x` and `--lite3d-y` CSS variables; the rest of the styling is entirely yours. For example, to put the dot on the left edge of a label:
+
+```css
+lite-3d [slot='hotspot'] {
+  transform: translate(var(--lite3d-x), var(--lite3d-y)) translate(-9px, -50%);
+}
+
+/* hidden hotspot: fully hidden by default */
+lite-3d [slot='hotspot'][data-visible='false'] {
+  opacity: 0.25;
+}
+```
+
+Because a hotspot is a regular `<button>`, it is reachable by keyboard and read by screen readers. When hotspots are present, the element gets `role="group"`.
+
+:::note
+A hotspot is attached to the model's rest-pose coordinates. It does not move with animated parts (for example, a walking leg).
+:::

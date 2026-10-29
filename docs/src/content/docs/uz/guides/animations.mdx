@@ -1,0 +1,173 @@
+---
+title: Animatsiya
+description: Modeldagi animatsiyalarni ijro etish, to'xtatish va almashtirish.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import Viewer from '../../../../components/Viewer.astro';
+
+Model fayli bir nechta animatsiyani saqlashi mumkin: eshik ochilishi, mexanizm aylanishi, personajning yurishi. `autoplay` birinchisini avtomatik boshlaydi, `animation-name` aniq qaysi biri ekanini tanlaydi.
+
+<Viewer
+  src="Robot.gltf.json"
+  alt="Robot, yurish va raqs animatsiyalari"
+  shadow
+  autoplay
+  animation-name="Walking"
+  controls="animations"
+/>
+
+```html
+<lite-3d src="robot.glb" autoplay animation-name="Walking"></lite-3d>
+```
+
+## Boshqarish
+
+```js
+el.animations;      // ['Dance', 'Death', 'Idle', 'Jump', ...] — fayldagi tartibda
+el.play('Dance');   // boshqa animatsiyaga o'tish
+el.pause();
+el.play();          // to'xtagan joyidan davom etish
+el.paused;          // true | false
+```
+
+| Atribut | Standart | Ma'nosi |
+|---|---|---|
+| `autoplay` | yo'q | Yuklangandan keyin darhol boshlash |
+| `animation-name` | birinchisi | Qaysi animatsiya |
+| `animation-speed` | `1` | Tezlik: `0.5` sekin, `2` tez |
+| `animation-loop` | yoqiq | `"false"` bo'lsa bir marta ijro etilib, oxirgi kadrda to'xtaydi |
+
+## Harakatlar ro'yxatini avtomatik chiqarish
+
+Harakat nomlarini qo'lda yozish shart emas: model yuklangach, `load` event'ining `detail.animations` maydonida fayldagi barcha harakatlar keladi. Yuqoridagi misol va bosh sahifadagi demo shu qoida bilan ishlaydi:
+
+| Modelda | Ko'rinishi |
+|---|---|
+| harakat yo'q | "Harakat yo'q" yozuvi |
+| 1–4 ta | hammasi tugma |
+| 5 va undan ko'p | dastlabki 4 tasi tugma, qolgani "Yana harakatlar" ro'yxatida |
+
+Ro'yxat fayldagi tartibda keladi. Qaysi harakatlar tugma bo'lishini o'zgartirmoqchi bo'lsangiz, ularni Blender'da birinchi qilib qo'ying yoki `names` massivini o'zingiz saralang.
+
+<Tabs syncKey="framework">
+<TabItem label="HTML">
+
+```html
+<lite-3d id="robot" src="robot.glb" autoplay></lite-3d>
+<div id="moves"></div>
+
+<script type="module">
+  const el = document.getElementById('robot');
+  const box = document.getElementById('moves');
+  const MAX = 4;
+
+  el.addEventListener('load', (e) => {
+    const names = e.detail.animations;
+    if (!names.length) {
+      box.textContent = "Harakat yo'q";
+      return;
+    }
+
+    const play = (name) => {
+      el.setAttribute('animation-name', name);
+      el.play(name);
+    };
+
+    const buttons = names.slice(0, MAX).map((name) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.onclick = () => play(name);
+      return b;
+    });
+    box.replaceChildren(...buttons);
+
+    const rest = names.slice(MAX);
+    if (rest.length) {
+      const more = document.createElement('select');
+      more.setAttribute('aria-label', 'Yana harakatlar');
+      more.append(new Option('Yana harakatlar', ''), ...rest.map((n) => new Option(n, n)));
+      more.onchange = () => more.value && play(more.value);
+      box.append(more);
+    }
+  });
+</script>
+```
+
+</TabItem>
+<TabItem label="React">
+
+```tsx
+'use client';
+import { useState } from 'react';
+import { Lite3D } from 'lite3d/react';
+
+const MAX = 4;
+
+export function Robot() {
+  const [names, setNames] = useState<string[] | null>(null);
+  const [current, setCurrent] = useState<string>();
+
+  const buttons = names?.slice(0, MAX) ?? [];
+  const rest = names?.slice(MAX) ?? [];
+
+  return (
+    <>
+      <Lite3D src="/robot.glb" autoplay animationName={current} onLoad={(e) => setNames(e.detail.animations)} />
+
+      {names?.length === 0 && <p>Harakat yo'q</p>}
+      {buttons.map((n) => (
+        <button key={n} aria-pressed={n === current} onClick={() => setCurrent(n)}>
+          {n}
+        </button>
+      ))}
+      {rest.length > 0 && (
+        <select
+          aria-label="Yana harakatlar"
+          value={current && rest.includes(current) ? current : ''}
+          onChange={(e) => e.target.value && setCurrent(e.target.value)}
+        >
+          <option value="">Yana harakatlar</option>
+          {rest.map((n) => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+      )}
+    </>
+  );
+}
+```
+
+`animationName` o'zgarganda lite3d yangi harakatga o'zi o'tadi, `play()` chaqirish shart emas.
+
+</TabItem>
+</Tabs>
+
+## Yangi harakat qo'shish
+
+Harakatlar model faylining ichida saqlanadi, lite3d ularni faqat ijro etadi. Shuning uchun yangi harakat kod bilan emas, 3D dasturda qo'shiladi:
+
+- **Odamsimon personaj:** [Mixamo](https://www.mixamo.com/)ga modelni yuklang, u skeletni o'zi qo'yadi. Kerakli harakatlarni (yurish, yugurish, raqs) tanlab yuklab oling va Blender'da bitta `.glb` faylga yig'ing. Har bir harakat alohida nomli klip bo'lib eksport qilinadi.
+- **Hayvon yoki mexanizm:** Blender'da skelet yoki kalit kadrlar bilan qo'lda animatsiya qilinadi. Eshik ochilishi, strelka aylanishi kabi oddiy harakatlar bir necha kalit kadr bilan tayyor bo'ladi.
+
+Fayl tayyor bo'lgach, yangi harakatlar yuqoridagi ro'yxatda o'zi paydo bo'ladi. Faylni siqish haqida: [Model tayyorlash](../../guides/preparing-models/).
+
+## Bir martalik harakat
+
+Eshik ochilishi yoki quti ochilishi kabi harakat bir marta bo'lib, ochiq holda qolishi kerak:
+
+```html
+<lite-3d src="shkaf.glb" autoplay animation-name="Open" animation-loop="false"></lite-3d>
+```
+
+Tugaganini `animation-finish` event'i bildiradi:
+
+```js
+el.addEventListener('animation-finish', (e) => {
+  console.log(e.detail.name, 'tugadi');
+});
+```
+
+:::note
+Foydalanuvchi tizimda harakatni kamaytirishni (`prefers-reduced-motion`) yoqqan bo'lsa, `autoplay` ishlamaydi. `play()` esa ishlaydi, chunki uni foydalanuvchining o'zi bosadi.
+:::

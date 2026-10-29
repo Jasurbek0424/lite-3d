@@ -1,0 +1,54 @@
+---
+title: Installation
+description: Add lite3d to your project with npm or from a CDN.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## With a package manager
+
+three.js is a peer dependency: it is installed once and shared with any other 3D code in your project.
+
+<Tabs syncKey="pm">
+  <TabItem label="npm">
+    ```sh
+    npm i lite3d three
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpm add lite3d three
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```sh
+    yarn add lite3d three
+    ```
+  </TabItem>
+  <TabItem label="bun">
+    ```sh
+    bun add lite3d three
+    ```
+  </TabItem>
+</Tabs>
+
+Then register the element once, in your app's entry file:
+
+```js
+import 'lite3d';
+```
+
+After that, `<lite-3d>` works anywhere. There are separate guides for [React](../../frameworks/react/) and [Next.js](../../frameworks/nextjs/).
+
+## Without a bundler, from a CDN
+
+This build includes three.js, so nothing else is needed:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/lite3d/dist/cdn/lite3d.cdn.js"></script>
+```
+
+## Requirements
+
+- A browser with WebGL 2 or WebGL 1: Chrome, Edge, Firefox, Safari 15+.
+- Importing during server-side rendering is safe: the element registers only in the browser.

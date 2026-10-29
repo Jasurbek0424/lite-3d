@@ -1,0 +1,28 @@
+# GitHub'da Release chiqarilganda paketni npm'ga joylaydi.
+# Bir marta sozlash kerak: npm'da Access Token yarating (Automation) va uni
+# Settings → Secrets and variables → Actions ga NPM_TOKEN nomi bilan qo'shing.
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # npm provenance: paket qaysi commit'dan yig'ilgani npm sahifasida ko'rinadi
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

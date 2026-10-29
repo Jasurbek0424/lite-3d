@@ -1,0 +1,47 @@
+---
+title: Variantlar va ranglar
+description: Bitta model ichida bir nechta rang yoki materialni almashtirish.
+---
+
+import Viewer from '../../../../components/Viewer.astro';
+
+Do'konlarda bitta mahsulot bir nechta rangda sotiladi. Buning ikki yo'li bor: modelga yozilgan variantlar va kod bilan rang berish.
+
+## Modeldagi variantlar
+
+Model fayli `KHR_materials_variants` kengaytmasi bilan bir nechta material to'plamini saqlashi mumkin. Blender'da bu "glTF Variants" orqali qilinadi. Variant nomini `variant` atributiga yozing:
+
+<Viewer src="Watch.gltf.json" alt="Xronograf soat" shadow controls="variants" />
+
+```html
+<lite-3d src="soat.glb" variant="Midnight Gold"></lite-3d>
+```
+
+Modelda qanday variantlar borligini `load` event'idan bilasiz. Shu ro'yxatdan rang tugmalarini yasash qulay:
+
+```js
+el.addEventListener('load', (e) => {
+  console.log(e.detail.variants); // ['Surgical White', 'Midnight Gold', ...]
+});
+
+el.setAttribute('variant', 'Khronos Red');
+el.removeAttribute('variant'); // asl materiallar
+```
+
+Teksturali mato, charm yoki yog'och uchun shu yo'l to'g'ri: har bir variantning o'z teksturasi bo'ladi.
+
+## Kod bilan rang berish
+
+Modelda variant bo'lmasa, materialning rangini to'g'ridan-to'g'ri almashtirish mumkin:
+
+```js
+el.materials;                              // ['fabric', 'wood Brown', 'metal', ...]
+el.setMaterialColor('metal', '#c9a227');   // true — material topildi
+el.setMaterialColor('metal', null);        // asl rangga qaytarish
+```
+
+Bu tekis rangli qismlar (metall, plastik) uchun yaxshi ishlaydi. Teksturali materialda yangi rang tekstura bilan ko'paytiriladi, shuning uchun kutilganidan to'qroq chiqadi.
+
+:::caution
+`setMaterialColor` model yuklangandan keyin ishlaydi. Undan oldin chaqirilsa `false` qaytaradi.
+:::

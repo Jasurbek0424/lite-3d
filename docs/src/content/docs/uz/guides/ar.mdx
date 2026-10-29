@@ -1,0 +1,26 @@
+---
+title: AR'da ko'rish
+description: Telefonda mahsulotni haqiqiy xonaga qo'yib ko'rish.
+---
+
+`ar` atributi qo'shilsa, mos qurilmada "AR'da ko'rish" tugmasi paydo bo'ladi. Foydalanuvchi uni bosib, mahsulotni kamera orqali o'z xonasida ko'radi.
+
+```html
+<lite-3d src="kreslo.glb" ios-src="kreslo.usdz" ar></lite-3d>
+```
+
+| Platforma | Nima ishlatiladi | Nima kerak |
+|---|---|---|
+| Android | Google Scene Viewer | Faqat `src` (`.glb`) |
+| iOS | Apple Quick Look | `ios-src` bilan `.usdz` fayl |
+
+Tugma faqat ishlaydigan qurilmada ko'rinadi. Kompyuterda u chiqmaydi.
+
+## USDZ faylini olish
+
+- macOS'da Apple'ning **Reality Converter** dasturi `.glb`ni `.usdz`ga o'giradi.
+- Blender 3.5+ to'g'ridan-to'g'ri USD/USDZ eksport qiladi.
+
+:::caution
+Android Scene Viewer modelni Google serverlari orqali ochadi, shuning uchun fayl ochiq internet manzilida bo'lishi kerak. `localhost` manzilida AR ishlamaydi.
+:::

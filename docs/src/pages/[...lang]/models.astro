@@ -1,0 +1,200 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Wide from '../../components/Wide.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { getModels, fileSize } from '../../data/models';
+import { href, langPaths, type Lang } from '../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const { lang } = Astro.props as { lang: Lang };
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const models = getModels(lang);
+
+const text = {
+  en: {
+    title: 'Models',
+    description: 'Sample 3D models on this site, their file sizes and authors.',
+    intro: 'The samples used on this site. Each one is compressed with meshopt and WebP; see how to prepare your own on the',
+    introLink: 'Preparing models',
+    introEnd: 'page.',
+    open: 'Open in demo',
+    openLabel: (name: string) => `Open ${name} in the demo`,
+    aside:
+      'Size is the file size on this site. The models are packed into a single file (base64) for testing, so a regular .glb is roughly a third smaller.',
+  },
+  uz: {
+    title: 'Modellar',
+    description: 'Saytdagi namunaviy 3D modellar, ularning hajmi va mualliflari.',
+    intro: "Saytdagi namunalar. Har biri meshopt va WebP bilan siqilgan, o'zingiz qanday tayyorlashni",
+    introLink: 'Model tayyorlash',
+    introEnd: "sahifasida ko'rasiz.",
+    open: 'Demoda ochish',
+    openLabel: (name: string) => `${name}ni demoda ochish`,
+    aside:
+      "Hajm — saytdagi fayl hajmi. Modellar sinov uchun bitta faylga joylangan (base64), shuning uchun oddiy .glb varianti taxminan uchdan bir qism kichikroq bo'ladi.",
+  },
+  ru: {
+    title: 'Модели',
+    description: 'Демонстрационные 3D-модели сайта, их размер и авторы.',
+    intro: 'Образцы, используемые на сайте. Каждый сжат через meshopt и WebP; как подготовить свою модель, описано на странице',
+    introLink: 'Подготовка модели',
+    introEnd: '',
+    open: 'Открыть в демо',
+    openLabel: (name: string) => `Открыть «${name}» в демо`,
+    aside:
+      'Размер — это размер файла на сайте. Для тестов модели упакованы в один файл (base64), поэтому обычный .glb примерно на треть меньше.',
+  },
+}[lang];
+---
+
+<StarlightPage
+  frontmatter={{
+    title: text.title,
+    description: text.description,
+    template: 'splash',
+    hero: { title: text.title },
+    tableOfContents: false,
+  }}
+>
+  <Wide>
+    <header class="intro">
+      <h1 id="_top" data-page-title>{text.title}</h1>
+      <p>
+        {text.intro}{' '}<a href={href(lang, '/guides/preparing-models/')}>{text.introLink}</a>{text.introEnd ? ' ' + text.introEnd : '.'}
+      </p>
+    </header>
+
+    <ul class="grid">
+      {
+        models.map((m) => (
+          <li class="card">
+            <a class="preview" href={href(lang, `/?model=${m.id}`)} aria-label={text.openLabel(m.name)}>
+              <img src={`${base}/posters/${m.id}.webp`} alt="" width="480" height="360" loading="lazy" decoding="async" />
+            </a>
+            <div class="body">
+              <div class="meta">
+                <span class="category">{m.category}</span>
+                <span class="size">{fileSize(m)}</span>
+              </div>
+              <h2>{m.name}</h2>
+              <p class="note">{m.note}</p>
+              <p class="credit">{m.credit}</p>
+              <a class="open" href={href(lang, `/?model=${m.id}`)}>
+                {text.open}
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="aside">{text.aside}</p>
+
+    <SiteFooter />
+  </Wide>
+</StarlightPage>
+
+<style>
+  .intro h1 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    color: var(--l3-text);
+  }
+  .intro p {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--l3-muted);
+    line-height: 1.6;
+  }
+  .intro a {
+    color: var(--l3-accent);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    margin: 0;
+    border-radius: 18px;
+    border: 1px solid transparent;
+    background: var(--l3-surface);
+    overflow: hidden;
+  }
+  .preview {
+    display: block;
+    background: var(--l3-stage);
+  }
+  .preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+  }
+  /* Ustun: matn yuqorida, tugma har doim kartaning pastida — qo'shni kartalar bilan bir qatorda */
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.1rem 1.2rem;
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--sl-text-xs);
+    color: var(--l3-muted);
+  }
+  .size {
+    font-variant-numeric: tabular-nums;
+  }
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--l3-text);
+  }
+  .note {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    color: var(--l3-text);
+  }
+  .credit {
+    margin: 0 0 0.9rem;
+    font-size: var(--sl-text-xs);
+    color: var(--l3-muted);
+  }
+  .open {
+    align-self: flex-start;
+    margin-top: auto;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: var(--l3-accent);
+    color: var(--l3-on-accent);
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .open:hover {
+    background: var(--l3-accent-hover);
+  }
+  :is(.open, .preview):focus-visible {
+    outline: 2px solid var(--l3-accent);
+    outline-offset: 2px;
+  }
+  .aside {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    color: var(--l3-muted);
+  }
+</style>
