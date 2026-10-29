@@ -67,6 +67,9 @@ const style = /* css */ `
 canvas { display: block; outline: none; }
 .poster { object-fit: contain; transition: opacity .35s ease; pointer-events: none; }
 :host([data-state="ready"]) .poster { opacity: 0; }
+.stage { transition: opacity .35s ease; }
+/* src almashganda eski model yangi poster ustida qolib ketmasin */
+:host(:not([data-state="ready"])) .poster:not([hidden]) ~ .stage { opacity: 0; }
 .progress {
   position: absolute; left: 0; bottom: 0; height: 3px; width: 0;
   background: var(--lite3d-accent); transition: width .2s ease, opacity .3s ease;
@@ -99,7 +102,7 @@ button:focus-visible { outline: 2px solid var(--lite3d-accent); outline-offset: 
 }
 ::slotted([slot="hotspot"][data-visible="false"]) { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
-  .poster, .progress, ::slotted([slot="hotspot"]) { transition: none; }
+  .poster, .stage, .progress, ::slotted([slot="hotspot"]) { transition: none; }
 }
 `;
 
@@ -434,6 +437,10 @@ export class Lite3DElement extends Base {
     if (this.dataset.state === 'fallback') return Promise.resolve();
     this.#setState('loading');
     this.#booting = (async () => {
+      // Model three.js bilan bir vaqtda yuklana boshlaydi, navbat kutmaydi
+      const src = this.src;
+      const early = src ? fetch(src) : null;
+      early?.catch(() => {});
       try {
         const { createRenderer } = await import('./renderer');
         if (!this.isConnected) return;
@@ -445,7 +452,7 @@ export class Lite3DElement extends Base {
         });
         this.#renderer.setActive(this.#visible && !document.hidden);
         this.#syncHotspots();
-        if (this.src) await this.#loadModel(this.src);
+        if (this.src) await this.#loadModel(this.src, this.src === src ? early : null);
       } catch (err) {
         this.#fail(err);
       }
@@ -453,7 +460,7 @@ export class Lite3DElement extends Base {
     return this.#booting;
   }
 
-  async #loadModel(url: string): Promise<void> {
+  async #loadModel(url: string, early?: Promise<Response> | null): Promise<void> {
     if (!this.#renderer) return;
     const token = ++this.#loadToken;
     this.#info = null;
@@ -467,7 +474,7 @@ export class Lite3DElement extends Base {
         this.#progress.style.width = pct + '%';
         this.#progress.setAttribute('aria-valuenow', String(pct));
         this.dispatchEvent(new CustomEvent('progress', { detail: { progress: p } }));
-      });
+      }, early);
       if (token !== this.#loadToken) return;
       this.#info = info;
       this.#setState('ready');

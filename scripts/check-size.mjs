@@ -1,9 +1,11 @@
-// Sahifa ochilganda yuklanadigan hajmni tekshiradi: dist/index.js va u statik import qiladigan chunk'lar (gzip -9).
+// Sahifa ochilganda yuklanadigan hajmni tekshiradi: dist/index.js va u statik import qiladigan chunk'lar
+// (minify + gzip -9). npm build siqilmagan, shuning uchun foydalanuvchi bundleri qiladigandek avval siqamiz.
 // CI'da ishlaydi: kimdir bilmasdan three.js'ni asosiy faylga tortib kirsa, PR qizil bo'ladi.
 //   node scripts/check-size.mjs [limitKB=5]
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { join } from 'node:path';
+import { transformSync } from 'esbuild';
 
 const LIMIT_KB = Number(process.argv[2] ?? 5);
 const dir = 'dist';
@@ -18,7 +20,8 @@ function collect(file) {
 }
 collect('index.js');
 
-const bytes = [...seen].reduce((sum, f) => sum + gzipSync(readFileSync(join(dir, f)), { level: 9 }).length, 0);
+const min = (f) => transformSync(readFileSync(join(dir, f), 'utf8'), { minify: true, format: 'esm', target: 'es2020' }).code;
+const bytes = [...seen].reduce((sum, f) => sum + gzipSync(min(f), { level: 9 }).length, 0);
 const kb = bytes / 1024;
 console.log(`first load: ${kb.toFixed(2)} KB gzip (${[...seen].join(', ')}), limit ${LIMIT_KB} KB`);
 if (kb > LIMIT_KB) {
