@@ -55,7 +55,10 @@ npm run dev          # http://localhost:4321/lite-3d/
 
 ## Releases
 
-Maintainers publish to npm by creating a GitHub Release; the `Release` workflow builds and publishes the package.
+1. Bump the version in a pull request: `npm version patch --no-git-tag-version` (or `minor` / `major`), then merge it.
+2. Create a GitHub Release with a tag that matches `package.json`, for example `v0.1.1`.
+3. The `Release` workflow runs the checks and stages the version on npm through Trusted Publishing (no tokens).
+4. A maintainer approves the staged version on npmjs.com with 2FA; only then it goes live.
 
 ## License
 
