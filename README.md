@@ -69,7 +69,7 @@ Without a bundler (three.js included):
 | `tone-mapping` | `neutral` | `neutral` (true product colors), `aces` or `agx` |
 | `environment` | room light | `"none"` for simple lights |
 | `shadow` | off | Contact shadow under the model |
-| `background` | transparent | Scene background color |
+| `background` | transparent | Scene background, any CSS color (alpha supported) |
 | `ar` | off | AR button (Android Scene Viewer; iOS needs `ios-src`) |
 | `ios-src` | — | `.usdz` file for iOS Quick Look |
 | `draco-decoder` | — | Decoder folder for Draco-compressed models |
