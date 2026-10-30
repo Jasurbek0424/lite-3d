@@ -196,12 +196,12 @@ function createContactShadow(renderer: WebGLRenderer) {
       cam.updateProjectionMatrix();
     },
     update(scene: Scene) {
-      const bg = scene.background;
+      // Fon rangi soyaning xiralashgan chetiga aralashmasin: shaffof qora bilan tozalaymiz
+      const color = renderer.getClearColor(new Color());
       const alpha = renderer.getClearAlpha();
-      scene.background = null;
       plane.visible = false;
       scene.overrideMaterial = depth;
-      renderer.setClearAlpha(0);
+      renderer.setClearColor(0x000000, 0);
       renderer.setRenderTarget(rt);
       renderer.clear();
       renderer.render(scene, cam);
@@ -209,8 +209,7 @@ function createContactShadow(renderer: WebGLRenderer) {
       blur(3);
       blur(1.2);
       renderer.setRenderTarget(null);
-      renderer.setClearAlpha(alpha);
-      scene.background = bg;
+      renderer.setClearColor(color, alpha);
       plane.visible = true;
     },
     dispose() {
@@ -220,6 +219,23 @@ function createContactShadow(renderer: WebGLRenderer) {
       [planeMat, depth, hBlur, vBlur].forEach((m) => m.dispose());
     },
   };
+}
+
+let swatch: CanvasRenderingContext2D | null = null;
+
+/**
+ * CSS rangini brauzerning o'zi o'qiydi: 1×1 canvas'ga bo'yab, pikselni olamiz.
+ * Shunda #rrggbbaa, rgba(), hsl(), oklch(), transparent — hammasi ishlaydi.
+ */
+function parseColor(css: string): { color: Color; alpha: number } | null {
+  if (!CSS.supports('color', css)) return null;
+  swatch ??= document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  if (!swatch) return null;
+  swatch.canvas.width = swatch.canvas.height = 1;
+  swatch.fillStyle = css;
+  swatch.fillRect(0, 0, 1, 1);
+  const [r, g, b, a] = swatch.getImageData(0, 0, 1, 1).data;
+  return { color: new Color().setRGB(r / 255, g / 255, b / 255, SRGBColorSpace), alpha: a / 255 };
 }
 
 /** Javobni o'qib, progressni (0..1) xabar qiladi. Hajm noma'lum bo'lsa progress bo'lmaydi. */
@@ -438,7 +454,8 @@ export function createRenderer(
     renderer.toneMappingExposure = opts.exposure;
     scene.environment = opts.environment ? envTex : null;
     fallbackLights.visible = !opts.environment;
-    scene.background = opts.background ? new Color(opts.background) : null;
+    const bg = opts.background ? parseColor(opts.background) : null;
+    renderer.setClearColor(bg?.color ?? 0x000000, bg?.alpha ?? 0);
     controls.enabled = opts.cameraControls;
     controls.autoRotate = opts.autorotate;
     controls.autoRotateSpeed = opts.autorotateSpeed * 2;
