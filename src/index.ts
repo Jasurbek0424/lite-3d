@@ -47,7 +47,9 @@ const OBSERVED = [
 
 const POSTER_KEY = 'lite3d:poster:';
 
-const style = /* css */ `
+// CSS ichida izoh yozilmaydi: satr paketga o'zgarishsiz tushadi.
+// .poster:not([hidden]) ~ .stage — src almashganda eski model yangi poster ustida qolib ketmasin.
+const style = `
 :host {
   --lite3d-bg: transparent;
   --lite3d-accent: #111;
@@ -68,7 +70,6 @@ canvas { display: block; outline: none; }
 .poster { object-fit: contain; transition: opacity .35s ease; pointer-events: none; }
 :host([data-state="ready"]) .poster { opacity: 0; }
 .stage { transition: opacity .35s ease; }
-/* src almashganda eski model yangi poster ustida qolib ketmasin */
 :host(:not([data-state="ready"])) .poster:not([hidden]) ~ .stage { opacity: 0; }
 .progress {
   position: absolute; left: 0; bottom: 0; height: 3px; width: 0;
@@ -238,7 +239,7 @@ export class Lite3DElement extends Base {
   pause(): void { this.#renderer?.pause(); }
   get paused(): boolean { return this.#renderer?.paused ?? true; }
 
-  /** Material rangini almashtiradi, null вЂ” asl rangiga qaytaradi. */
+  /** Material rangini almashtiradi, null — asl rangiga qaytaradi. */
   setMaterialColor(material: string, color: string | null): boolean {
     return this.#renderer?.setMaterialColor(material, color) ?? false;
   }

@@ -4,7 +4,7 @@
   "description": "A 4.5 KB web component for 3D product viewers. three.js loads only when the model is needed.",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup && tsc -p .",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup && node scripts/strip-comments.mjs && tsc -p .",
     "typecheck": "tsc -p . --noEmit",
     "size": "node scripts/check-size.mjs 5",
     "prepublishOnly": "npm run build"
@@ -37,6 +37,7 @@
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/three": "^0.186.0",
+    "acorn": "^8.19.0",
     "esbuild": "^0.28.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
